@@ -1,6 +1,7 @@
 .DS_Store
 fe/node_modules
 be/node_modules
+be/public
 /fe/dist
 
 
