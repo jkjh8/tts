@@ -8,7 +8,7 @@
         min-height="300px"
       >
         <v-card-title class="title">
-          Login
+          Register
         </v-card-title>
         <v-card-text>
           <v-form

@@ -2,9 +2,7 @@
   <v-app>
     <router-view name="layout"></router-view>
     <v-main>
-      <v-container fill-height fluid>
-        <router-view></router-view>
-      </v-container>
+      <router-view></router-view>
     </v-main>
   </v-app>
 </template>
