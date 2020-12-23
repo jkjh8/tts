@@ -19,6 +19,14 @@
           >
             <v-row>
               <v-text-field
+                label="Name"
+                v-model="Name"
+                :rules="nameRules"
+                required
+              />
+            </v-row>
+            <v-row>
+              <v-text-field
                 label="E-Mail"
                 v-model="email"
                 :rules="emailRules"
@@ -36,20 +44,27 @@
               />
             </v-row>
             <v-row>
+              <v-text-field
+                label="Check Password"
+                v-model="chkpassword"
+                :rules="passwordRules"
+                :append-icon="isChkPwd ? 'mdi-eye-off' : 'mdi-eye'"
+                :type="isChkPwd ? 'password' : 'text'"
+                @click:append="isChkPwd = !isChkPwd"
+              />
+            </v-row>
+            <v-row class="mt-3">
               <v-btn
                 block
                 :disabled="!valid"
                 color="success"
                 @click="submit"
               >
-                Login
+                Register
               </v-btn>
             </v-row>
             <v-row>
               <v-spacer />
-              <v-btn text>
-                Register
-              </v-btn>
               <v-btn
                 text
                 to="/"
@@ -69,17 +84,23 @@ export default {
   data () {
     return {
       valid: false,
+      name: '',
+      nameRules: [
+        v => !!v || 'Name is required'
+      ],
       email: '',
       emailRules: [
         v => !!v || 'E-mail is required',
         v => /.+@.+\..+/.test(v) || 'E-mail must be valid'
       ],
       password: '',
+      chkpassword: '',
       passwordRules: [
         v => !!v || 'Password is required',
         v => (v && v.length >= 8) || 'more then 8 digit'
       ],
-      isPwd: true
+      isPwd: true,
+      isChkPwd: true
     }
   },
   methods: {
