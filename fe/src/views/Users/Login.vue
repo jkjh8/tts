@@ -35,7 +35,7 @@
                 @click:append="isPwd = !isPwd"
               />
             </v-row>
-            <v-row>
+            <v-row class="mt-3">
               <v-btn
                 block
                 :disabled="!valid"
@@ -47,7 +47,7 @@
             </v-row>
             <v-row>
               <v-spacer />
-              <v-btn text>
+              <v-btn text to="/register">
                 Register
               </v-btn>
               <v-btn

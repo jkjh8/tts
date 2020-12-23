@@ -116,6 +116,32 @@
       >
         {{ date }}
       </div>
+      <v-spacer />
+      <div>
+        <v-menu
+          open-on-hover
+          bottom
+          offset-y
+        >
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              v-bind="attrs"
+              v-on="on"
+              icon
+            >
+              <v-icon>mdi-account</v-icon>
+            </v-btn>
+          </template>
+          <v-list>
+            <v-list-item>
+              <v-btn text to="/login">Login</v-btn>
+            </v-list-item>
+            <v-list-item>
+              <v-btn text to="/register">Register</v-btn>
+            </v-list-item>
+          </v-list>
+        </v-menu>
+      </div>
     </v-app-bar>
   </div>
 </template>
