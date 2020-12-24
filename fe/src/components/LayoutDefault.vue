@@ -1,5 +1,6 @@
 <template>
   <div>
+    <!-- navigation-drawer -->
     <v-navigation-drawer
       v-model="drawer"
       clipped
@@ -77,6 +78,7 @@
         </v-list-item-group>
       </v-list>
 
+      <!-- navigation-drawer-footer -->
       <template v-slot:append>
         <v-row>
           <v-col class="ml-6 text-left" style="font-size: 0.7rem;">
@@ -96,6 +98,7 @@
       </template>
     </v-navigation-drawer>
 
+    <!-- menu-bar -->
     <v-app-bar
       color="white"
       clipped-left
@@ -116,8 +119,11 @@
       >
         {{ date }}
       </div>
+
       <v-spacer />
-      <div>
+
+      <!-- login -->
+      <div v-if="!user">
         <v-menu
           open-on-hover
           bottom
@@ -133,13 +139,60 @@
             </v-btn>
           </template>
           <v-list>
-            <v-list-item>
-              <v-btn text to="/login">Login</v-btn>
+            <v-list-item class="px-0">
+              <v-btn text block to="/login">Login</v-btn>
             </v-list-item>
-            <v-list-item>
-              <v-btn text to="/register">Register</v-btn>
+            <v-list-item class="px-0">
+              <v-btn text block to="/register">Register</v-btn>
             </v-list-item>
           </v-list>
+        </v-menu>
+      </div>
+
+      <div v-if="user">
+        <v-menu
+          open-on-hover
+          bottom
+          offset-y
+        >
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              v-bind="attrs"
+              v-on="on"
+              icon
+            >
+              <v-avatar
+                size="36"
+                color="primary"
+              >
+                <span class="white--text headline">{{ user.name }}</span>
+              </v-avatar>
+            </v-btn>
+          </template>
+          <v-card class="px-0" width="200">
+            <v-card-title class="px-0">
+              <div class="mx-auto text-center">
+                <v-avatar
+                  size="54"
+                  color="primary"
+                >
+                  <span class="white--text headline">{{ user.name }}</span>
+                </v-avatar>
+                <h3 class="my-3">{{ user.name }}</h3>
+                <p class="caption mt-1">{{ user.email }}</p>
+              </div>
+            </v-card-title>
+            <v-card-text class="px-0">
+              <v-list dense>
+                <v-list-item>
+                  <v-btn block text>Account</v-btn>
+                </v-list-item>
+                <v-list-item>
+                  <v-btn block text @click="logout">Logout</v-btn>
+                </v-list-item>
+              </v-list>
+            </v-card-text>
+          </v-card>
         </v-menu>
       </div>
     </v-app-bar>
@@ -148,9 +201,11 @@
 
 <script>
 import moment from 'moment'
+import { user } from '../mixins/user'
 
 export default {
   name: 'app',
+  mixins: [user],
   data () {
     return {
       selectedItem: 0,
