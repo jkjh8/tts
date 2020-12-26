@@ -15,7 +15,7 @@
           active-class="nav-selected"
         >
           <v-subheader class="nav-font">MONITORING</v-subheader>
-          <v-list-item @click="updateTime">
+          <v-list-item to="/">
             <v-list-item-avatar>
               <v-icon>mdi-file-chart</v-icon>
             </v-list-item-avatar>
@@ -24,7 +24,7 @@
               <v-list-item-subtitle>play server status</v-list-item-subtitle>
             </v-list-item-content>
           </v-list-item>
-          <v-list-item @click="updateTime">
+          <v-list-item to="/eventlog">
             <v-list-item-avatar>
               <v-icon>mdi-format-list-bulleted-type</v-icon>
             </v-list-item-avatar>
@@ -36,16 +36,25 @@
 
           <v-subheader>MANAGEMENT</v-subheader>
 
-          <v-list-item @click="updateTime">
+          <v-list-item to="/audiofiles">
             <v-list-item-avatar>
               <v-icon>mdi-file</v-icon>
             </v-list-item-avatar>
             <v-list-item-content>
               <v-list-item-title>Audio Files</v-list-item-title>
-              <v-list-item-subtitle>audio files and playlist</v-list-item-subtitle>
+              <v-list-item-subtitle>add and delete audio files</v-list-item-subtitle>
             </v-list-item-content>
           </v-list-item>
-          <v-list-item @click="updateTime">
+          <v-list-item to="/playlist">
+            <v-list-item-avatar>
+              <v-icon>mdi-playlist-plus</v-icon>
+            </v-list-item-avatar>
+            <v-list-item-content>
+              <v-list-item-title>Playlist</v-list-item-title>
+              <v-list-item-subtitle>playlist for player</v-list-item-subtitle>
+            </v-list-item-content>
+          </v-list-item>
+          <v-list-item to="/tts">
             <v-list-item-avatar>
               <v-icon>mdi-play</v-icon>
             </v-list-item-avatar>
@@ -54,7 +63,7 @@
               <v-list-item-subtitle>text to speech player</v-list-item-subtitle>
             </v-list-item-content>
           </v-list-item>
-          <v-list-item @click="updateTime">
+          <v-list-item to="/scheduler">
             <v-list-item-avatar>
               <v-icon>mdi-calendar-month</v-icon>
             </v-list-item-avatar>
@@ -66,7 +75,7 @@
 
           <v-subheader>MANAGEMENT</v-subheader>
 
-          <v-list-item @click="updateTime">
+          <v-list-item to="utilities">
             <v-list-item-avatar>
               <v-icon>mdi-power</v-icon>
             </v-list-item-avatar>
@@ -185,7 +194,7 @@
             <v-card-text class="px-0">
               <v-list dense>
                 <v-list-item>
-                  <v-btn block text>Account</v-btn>
+                  <v-btn block text to="/account">Account</v-btn>
                 </v-list-item>
                 <v-list-item>
                   <v-btn block text @click="logout">Logout</v-btn>
@@ -201,7 +210,7 @@
 
 <script>
 import moment from 'moment'
-import { user } from '../mixins/user'
+import { user } from '../../mixins/user'
 
 export default {
   name: 'app',
@@ -214,6 +223,7 @@ export default {
     }
   },
   mounted () {
+    // this.getUser()
     moment.locale('ko')
     setInterval(this.updateTime, 1000)
   },

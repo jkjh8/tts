@@ -23,7 +23,9 @@ exports.config = (passport) => {
       if (!user) {
         done(null, false, { message: "Check your E-Mail"});
       } else {
-        if (bcrypt.compareSync(password,user.password)) {
+        console.log(user.password)
+        console.log(password)
+        if (bcrypt.compareSync(password, user.password)) {
           done(null, user)
         } else {
           done(null, false, { message: "Check your password"});

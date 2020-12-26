@@ -1,22 +1,16 @@
 const passport = require('passport')
-const bcrypt = require('bcrypt')
 const User = require('../../models/User')
 
-module.exports.register = async function(req, res) {
-  
-  const currentEmail = await User.findOne({ email: req.body.data.email })
+module.exports.register = async function(req, res) {  
+  const currentEmail = await User.findOne({ email: req.body.email })
   if (currentEmail !== null) {
     return res.status(500).json({ message: 'This email is already use' })
   }
   const user = new User({
-    name: req.body.data.name,
-    email: reqw.body.data.email,
-    password: req.body.data.password
+    name: req.body.name,
+    email: req.body.email,
+    password: req.body.password
   })
-  const salt = bcrypt.genSaltSync(10)
-  const hash = bcrypt.hashSync(user.password, salt)
-  user.password = hash
-
   user.save((err, user) => {
     if (err) {
       return res.status(500).json({ message: 'Error on register' })
@@ -28,6 +22,7 @@ module.exports.register = async function(req, res) {
 }
 
 module.exports.login = function(req, res, next) {
+  console.log(req.body)
   passport.authenticate('local', (err, user, info) => {
     if (err) { return next(err) }
     if (!user) { return res.status(403).json(info) }
@@ -42,7 +37,7 @@ module.exports.user = function(req, res) {
   if (req.isAuthenticated() && req.user) {
     return res.status(200).json({ user: req.user });
   }
-  return res.redirect('/')
+  return res.status(403).json({ user: null })
 }
 
 module.exports.logout = function(req, res) {
@@ -51,4 +46,9 @@ module.exports.logout = function(req, res) {
     message: 'Logout complate',
     user: null
   })
+}
+
+module.exports.users = async function(req, res) {
+  const users = await User.find({})
+  return res.status(200).json(users)
 }

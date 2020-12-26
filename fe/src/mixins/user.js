@@ -15,7 +15,7 @@ export const user = {
           this.$store.dispatch('users/updateUser', null)
         }
       }).catch((err) => {
-        this.$store.dispatch('user/updateUser', null)
+        this.$store.dispatch('users/updateUser', null)
         console.log(err.response)
       })
     },
@@ -31,12 +31,19 @@ export const user = {
         })
       })
     },
-    logout () {
-      this.$axios.get('/api/users/logout').then((res) => {
-        this.$store.dispatch('users/updateUser', res.data.user)
-        this.$router.push('/')
-        this.$dialog.notify.info('You are logged out')
+    async logout () {
+      const result = await this.$dialog.confirm({
+        text: 'Do you really want to logout?',
+        title: 'Logout'
       })
+      if (result) {
+        this.$axios.get('/api/users/logout').then((res) => {
+          this.$store.dispatch('users/updateUser', res.data.user)
+          this.$dialog.message.info('You are logged out', {
+            position: 'bottom'
+          })
+        })
+      }
     }
   }
 }

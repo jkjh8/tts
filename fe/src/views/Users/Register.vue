@@ -114,9 +114,6 @@ export default {
       isChkPwd: true
     }
   },
-  created () {
-    this.getUser()
-  },
   methods: {
     async submit () {
       const confirm = await this.$refs.form.validate()

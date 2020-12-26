@@ -7,6 +7,7 @@ const users = require('../api/users')
 router.post('/api/users/register', users.register)
 router.post('/api/users/login', users.login)
 router.get('/api/users/login', users.user)
+router.get('/api/users/users', users.users)
 router.get('/api/users/logout', users.logout)
 
 module.exports = router;

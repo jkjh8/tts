@@ -1,17 +1,16 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import LayoutDefault from '../components/LayoutDefault.vue'
-import Home from '../views/Home.vue'
+import LayoutDefault from '../components/Layout/LayoutDefault.vue'
 
 Vue.use(VueRouter)
 
 const routes = [
   {
     path: '/',
-    name: 'Home',
+    name: 'Status',
     components: {
       layout: LayoutDefault,
-      default: Home
+      default: () => import('../views/Status.vue')
     }
   },
   {
@@ -31,12 +30,60 @@ const routes = [
     }
   },
   {
-    path: '/about',
-    name: 'About',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
+    path: '/account',
+    name: 'Account',
+    components: {
+      layout: LayoutDefault,
+      default: () => import('../views/Users/Account.vue')
+    }
+  },
+  {
+    path: '/eventlog',
+    name: 'Eventlog',
+    components: {
+      layout: LayoutDefault,
+      default: () => import('../views/Eventlog.vue')
+    }
+  },
+  {
+    path: '/audiofiles',
+    name: 'Audiofiles',
+    components: {
+      layout: LayoutDefault,
+      default: () => import('../views/Audiofiles.vue')
+    }
+  },
+  {
+    path: '/playlist',
+    name: 'Playlist',
+    components: {
+      layout: LayoutDefault,
+      default: () => import('../views/Playlist.vue')
+    }
+  },
+  {
+    path: '/tts',
+    name: 'Tts',
+    components: {
+      layout: LayoutDefault,
+      default: () => import('../views/Tts.vue')
+    }
+  },
+  {
+    path: '/scheduler',
+    name: 'Scheduler',
+    components: {
+      layout: LayoutDefault,
+      default: () => import('../views/Scheduler.vue')
+    }
+  },
+  {
+    path: '/utilities',
+    name: 'Utilities',
+    components: {
+      layout: LayoutDefault,
+      default: () => import('../views/Utilities.vue')
+    }
   },
   {
     path: '*',
