@@ -16,11 +16,15 @@ require('dotenv').config()
 
 var indexRouter = require('./routes/index');
 
+const homedir = require('os').homedir()
+const mediaFolder = path.join(homedir, '/media')
+
 var app = express();
+app.use('/static', express.static(mediaFolder))
 
 // view engine setup
 app.use(cors())
-app.use(history())
+// app.use(history())
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

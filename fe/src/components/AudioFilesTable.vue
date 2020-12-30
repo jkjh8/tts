@@ -1,0 +1,98 @@
+<template>
+  <v-container>
+    <v-data-table
+      class="pa-0"
+      v-model="selected"
+      :headers="headers"
+      :items="items"
+      :search="search"
+      item-key="name"
+      show-select
+    >
+     <template v-slot:item.name="{ item }" scops="props">
+       <v-icon v-if="item.isplay" color="red" @click="preview(item)">mdi-pause</v-icon>
+       <v-icon v-else color="red" @click="preview(item)">mdi-play</v-icon>
+       {{ item.name }}
+     </template>
+     <template v-slot:item.size="{ item }">
+       {{ bytes(item.size) }}
+     </template>
+    </v-data-table>
+    <audio id="audio" ref="audio" v-on:ended="audioend">
+      <source v-bind:src="source">
+    </audio>
+  </v-container>
+</template>
+
+<script>
+import { dataFormat } from '../mixins/format'
+import { playlist } from '../mixins/playlist'
+
+export default {
+  mixins: [dataFormat, playlist],
+  props: ['search'],
+  data () {
+    return {
+      audio: undefined,
+      selected: [],
+      headers: [
+        { text: 'Name', value: 'name' },
+        { text: 'Type', value: 'type' },
+        { text: 'Size', value: 'size' }
+      ],
+      items: [],
+      source: '',
+      type: '',
+      audioDuration: 100
+    }
+  },
+  created () {
+    this.getList()
+  },
+  methods: {
+    preview (item) {
+      const index = this.items.indexOf(item)
+      if (this.items[index].isplay === false) {
+        for (let i = 0; i < this.items.length; i++) {
+          if (this.items[i].isplay) {
+            this.items[i].isplay = false
+          }
+        }
+        this.source = `http://${window.location.hostname}:3000/static/${item.name}`
+        this.$refs.audio.load()
+        this.$refs.audio.play()
+        this.items[index].isplay = true
+      } else {
+        this.$refs.audio.pause()
+        this.items[index].isplay = false
+      }
+    },
+    getList () {
+      this.$axios.get('/api/audiofiles').then((res) => {
+        this.items = res.data
+      })
+    },
+    delete () {
+      this.$axios.post('/api/delfiles/', this.selected).then((res) => {
+        this.$axios.get('/api/audiofiles').then((res) => {
+          this.items = res.data
+        })
+      })
+      this.resetSel()
+    },
+    audioend () {
+      for (let i = 0; i < this.items.length; i++) {
+        if (this.items[i].isplay) {
+          this.items[i].isplay = false
+        }
+      }
+    },
+    resetSel () {
+      this.selected = []
+    },
+    addPlaylist () {
+      this.addPlaylistItems(this.selected)
+    }
+  }
+}
+</script>

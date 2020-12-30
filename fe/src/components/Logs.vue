@@ -45,6 +45,19 @@ export default {
   },
   mounted () {
     this.changePage(this.page)
+  },
+  methods: {
+    async deleteLogs () {
+      const res = await this.$dialog.warning({
+        text: 'Do you really want to delete?',
+        title: 'Warning'
+      })
+      if (res) {
+        this.$axios.get('/api/log/del').then((res) => {
+          this.changePage(1)
+        })
+      }
+    }
   }
 }
 </script>

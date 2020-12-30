@@ -1,7 +1,7 @@
 <template>
   <v-container>
-    <v-row rows="2" justify="center">
-      <div class="ml-3 mt-1">
+    <v-row rows="2" class="mx-2">
+      <div class="mt-2">
         <h3>Event Log</h3>
       </div>
       <v-spacer />
@@ -17,12 +17,26 @@
         />
       </div>
       <div class="mx-3 mt-1" v-if="user">
-        <v-icon v-if="user.admin" @click="deleteLogs">mdi-delete</v-icon>
+        <v-tooltip top>
+          <template v-slot:activator="{ on, attrs }">
+            <v-icon
+              v-if="user.admin"
+              class="icon"
+              color="gray"
+              v-bind="attrs"
+              v-on="on"
+              @click="deleteLogs"
+            >
+              mdi-delete
+            </v-icon>
+          </template>
+          <span>Delete all logs</span>
+        </v-tooltip>
       </div>
     </v-row>
     <v-divider />
     <v-row rows="10">
-      <Logs :search="search" />
+      <Logs :search="search" ref="logTable" />
     </v-row>
   </v-container>
 </template>
@@ -40,14 +54,8 @@ export default {
     }
   },
   methods: {
-    async deleteLogs () {
-      const res = await this.$dialog.warning({
-        text: 'Do you really want to delete?',
-        title: 'Warning'
-      })
-      if (res) {
-        console.log('delete logs')
-      }
+    deleteLogs () {
+      this.$refs.logTable.deleteLogs()
     }
   }
 }
