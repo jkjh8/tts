@@ -10,15 +10,15 @@
       show-select
     >
      <template v-slot:item.name="{ item }" scops="props">
-       <v-icon v-if="item.isplay" color="red" @click="preview(item)">mdi-pause</v-icon>
-       <v-icon v-else color="red" @click="preview(item)">mdi-play</v-icon>
+       <v-icon v-if="item.isplay" color="red darken-4" @click="preview(item)">mdi-pause</v-icon>
+       <v-icon v-else color="green darken-4" @click="preview(item)">mdi-play</v-icon>
        {{ item.name }}
      </template>
      <template v-slot:item.size="{ item }">
        {{ bytes(item.size) }}
      </template>
     </v-data-table>
-    <audio id="audio" ref="audio" v-on:ended="audioend">
+    <audio ref="audio" v-on:ended="audioend">
       <source v-bind:src="source">
     </audio>
   </v-container>
@@ -33,7 +33,6 @@ export default {
   props: ['search'],
   data () {
     return {
-      audio: undefined,
       selected: [],
       headers: [
         { text: 'Name', value: 'name' },
@@ -67,6 +66,13 @@ export default {
         this.items[index].isplay = false
       }
     },
+    audioend () {
+      for (let i = 0; i < this.items.length; i++) {
+        if (this.items[i].isplay) {
+          this.items[i].isplay = false
+        }
+      }
+    },
     getList () {
       this.$axios.get('/api/audiofiles').then((res) => {
         this.items = res.data
@@ -79,13 +85,6 @@ export default {
         })
       })
       this.resetSel()
-    },
-    audioend () {
-      for (let i = 0; i < this.items.length; i++) {
-        if (this.items[i].isplay) {
-          this.items[i].isplay = false
-        }
-      }
     },
     resetSel () {
       this.selected = []

@@ -18,8 +18,8 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn @click="addList">OK</v-btn>
-        <v-btn @click="close">Cancel</v-btn>
+        <v-btn text @click="addList">OK</v-btn>
+        <v-btn text @click="close">Cancel</v-btn>
       </v-card-actions>
     </v-card>
   </v-container>

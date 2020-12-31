@@ -19,15 +19,23 @@
 </template>
 
 <script>
+import { playlist } from '../mixins/playlist'
 import PlaylistNames from '../components/Playlist/PlaylistNames'
 import PlaylistItems from '../components/Playlist/PlaylistItems'
 
 export default {
+  mixins: [playlist],
   components: { PlaylistNames, PlaylistItems },
   data () {
     return {
       //
     }
+  },
+  mounted () {
+    this.$axios.get('/api/playlist/getplaylistname').then(async (res) => {
+      await this.$store.dispatch('playlist/updatePlaylistNames', res.data)
+      this.getPlaylistItems(this.currentPlaylist)
+    })
   },
   methods: {
     //

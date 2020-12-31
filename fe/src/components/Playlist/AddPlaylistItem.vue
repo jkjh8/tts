@@ -20,8 +20,8 @@
     </v-card-text>
     <v-card-actions>
       <v-spacer />
-      <v-btn @click="addListItem">OK</v-btn>
-      <v-btn @click="cancelAdd">Cancel</v-btn>
+      <v-btn text @click="addListItem">OK</v-btn>
+      <v-btn text @click="cancelAdd">Cancel</v-btn>
     </v-card-actions>
   </v-card>
 </template>
@@ -40,6 +40,7 @@ export default {
     addListItem () {
       this.$emit('closeAddItemDialog')
       this.$refs.filelist.addPlaylist()
+      this.$refs.filelist.resetSel()
     },
     cancelAdd () {
       this.$emit('closeAddItemDialog')

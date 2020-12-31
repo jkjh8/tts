@@ -22,6 +22,7 @@ const actions = {
   },
   updatePlaylistItems ({ commit }, payload) {
     commit('updatePlaylistItems', payload)
+    console.log(payload)
   },
   updateCurrentPlaylist ({ commit }, payload) {
     commit('updateCurrentPlaylist', payload)

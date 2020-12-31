@@ -9,11 +9,11 @@
           Playlist
         </div>
         <v-spacer />
-        <div color="gray">
+        <div>
           <v-tooltip top>
             <template v-slot:activator="{ on, attrs }">
               <v-btn
-                color="gray"
+                color="blue-grey darken-4"
                 icon
                 v-bind="attrs"
                 v-on="on"
@@ -32,7 +32,7 @@
             v-model="model"
             active-class="border"
             mandatory
-            color="indigo"
+            color="blue-grey darken-4"
           >
             <v-list-item
               v-for="(item, i) in playlistnames"
@@ -46,7 +46,7 @@
               </v-list-item-content>
               <v-list-item-action>
                   <v-icon
-                    color="red"
+                    color="red darken-4"
                     small
                     @click="deleteList(i)"
                   >
@@ -82,41 +82,19 @@ export default {
       dialog: false
     }
   },
-  created () {
-    this.selPlaylist(this.model)
-    this.getList()
-  },
   methods: {
     getList () {
-      this.$axios.get('/api/playlist/getplaylistname').then((res) => {
-        this.$store.dispatch('playlist/updatePlaylistNames', res.data)
-      })
+      this.getPlaylistNames()
     },
     addList (item) {
-      this.$axios.post('/api/playlist/addplaylistname', { name: item }).then((res) => {
-        console.log(res)
-        this.getList()
-      })
+      this.addPlaylistNames(item)
       this.close()
     },
     close () {
       this.dialog = false
     },
-    async deleteList (item) {
-      const result = await this.$dialog.warning({
-        text: 'Do you really want to delete?',
-        title: 'Delete'
-      })
-      if (result) {
-        this.$axios.post('/api/playlist/delplaylistname', this.playlistnames[item]).then((res) => {
-          console.log(res)
-          this.getList()
-        })
-      }
-    },
-    async selPlaylist (idx) {
-      await this.$store.dispatch('playlist/updateCurrentPlaylist', idx)
-      this.getPlaylistItems()
+    deleteList (item) {
+      this.delPlaylistNames(item)
     }
   }
 }

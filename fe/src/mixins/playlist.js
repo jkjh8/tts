@@ -9,8 +9,32 @@ export const playlist = {
     })
   },
   methods: {
-    getPlaylistItems () {
-      this.$axios.get(`/api/playlist/getplaylistitems/${this.playlistnames[this.currentPlaylist].name}`).then((res) => {
+    getPlaylistNames () {
+      this.$axios.get('/api/playlist/getplaylistname').then((res) => {
+        return this.$store.dispatch('playlist/updatePlaylistNames', res.data)
+      })
+    },
+    addPlaylistNames (item) {
+      this.$axios.post('/api/playlist/addplaylistname', { name: item }).then(() => {
+        this.getPlaylistNames()
+      }).catch(err => { this.$dialog.message.error(`${err}`, { position: 'top' }) })
+    },
+    async delPlaylistNames (item) {
+      const result = await this.$dialog.warning({ text: 'Do you really want to delete?', title: 'Delete' })
+      if (result) {
+        this.$axios.post('/api/playlist/delplaylistname', this.playlistnames[item]).then((res) => {
+          console.log(res)
+          this.getPlaylistNames()
+          if (this.currentPlaylist + 1 < this.playlistnames.length) {
+            this.getPlaylistItems(this.currentPlaylist + 1)
+          } else {
+            this.getPlaylistItems(this.currentPlaylist - 1)
+          }
+        }).catch(err => { this.$dialog.message.error(`${err}`, { position: 'top' }) })
+      }
+    },
+    getPlaylistItems (current) {
+      this.$axios.get(`/api/playlist/getplaylistitems/${this.playlistnames[current].name}`).then((res) => {
         this.$store.dispatch('playlist/updatePlaylistItems', res.data)
       })
     },
@@ -18,11 +42,32 @@ export const playlist = {
       for (let i = 0; i < list.length; i++) {
         list[i].listname = this.playlistnames[this.currentPlaylist].name
       }
-      console.log(list)
       this.$axios.post('/api/playlist/addplaylistitems', list).then((res) => {
         console.log(res)
-        this.getPlaylistItems()
+        this.getPlaylistItems(this.currentPlaylist)
       })
+    },
+    async delPlaylistItems (idx) {
+      const result = await this.$dialog.warning({ text: 'Do you really want to delete?', title: 'Delete' })
+      if (result) {
+        this.$axios.post('/api/playlist/delplaylistitem', this.playlistitems[idx]).then((res) => {
+          console.log(res)
+          this.getPlaylistItems(this.currentPlaylist)
+        }).catch(err => { this.$dialog.message.error(`${err}`, { position: 'top' }) })
+      }
+    },
+    async delAllPlaylistItems () {
+      const result = await this.$dialog.warning({ text: 'Do you really want to delete?', title: 'Delete' })
+      if (result) {
+        this.$axios.post('/api/playlist/delallplaylistitem', this.playlistnames[this.currentPlaylist]).then((res) => {
+          console.log(res)
+          this.getPlaylistItems(this.currentPlaylist)
+        }).catch(err => { this.$dialog.message.error(`${err}`, { position: 'top' }) })
+      }
+    },
+    async selPlaylist (idx) {
+      await this.$store.dispatch('playlist/updateCurrentPlaylist', idx)
+      this.getPlaylistItems(idx)
     }
   }
 }

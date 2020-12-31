@@ -10,5 +10,7 @@ router.post('/api/playlist/delplaylistname', playlist.delPlaylistName)
 
 router.get('/api/playlist/getplaylistitems/:listname', playlist.getPlaylistItem)
 router.post('/api/playlist/addplaylistitems', playlist.addPlaylistItem)
+router.post('/api/playlist/delplaylistitem', playlist.delPlaylistItem)
+router.post('/api/playlist/delallplaylistitem', playlist.delAllPlaylistItems)
 
 module.exports = router
