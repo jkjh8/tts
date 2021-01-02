@@ -5,30 +5,46 @@ const path = require('path')
 const mediaFolder = path.join(homedir, '/media')
 !fs.existsSync(mediaFolder) && fs.mkdirSync(mediaFolder)
 
+function getDir (folder) {
+  if (folder) {
+    return path.join(mediaFolder, folder)
+  } else {
+    return mediaFolder
+  }
+}
+
 module.exports.files = async function(req, res) {
-  const folders= []
-  const files = []
-  const fileList = await fs.readdirSync(mediaFolder)
-  fileList.forEach(file => {
-    const stat = fs.statSync(path.join(mediaFolder, file))
-    if (stat.isDirectory()) {
-      folders.push({
-        name: file,
-        type: "Dir",
-        size: stat.size,
-        isdir: stat.isDirectory()
-      })
-    } else {
-      files.push({
-        name: file,
-        type: file.split('.').pop(),
-        isdir: stat.isDirectory(),
-        size: stat.size,
-        isplay: false
-      })
-    }
-  })
-  return res.status(200).json({ folders: folders, files: files })
+  try {
+    const getFolder = await getDir(req.body.folder)
+    const folders= []
+    const files = []
+    const fileList = await fs.readdirSync(getFolder)
+    fileList.forEach(file => {
+      const filePath = path.join(getFolder, file)
+      const stat = fs.statSync(filePath)
+      if (stat.isDirectory()) {
+        folders.push({
+          name: file,
+          path: filePath,
+          type: "Dir",
+          size: stat.size,
+          isdir: stat.isDirectory()
+        })
+      } else {
+        files.push({
+          name: file,
+          path: filePath,
+          type: file.split('.').pop(),
+          isdir: stat.isDirectory(),
+          size: stat.size,
+          isplay: false
+        })
+      }
+    })
+    return res.status(200).json({ result: 'success', folders: folders, files: files })
+  } catch (err) {
+    return res.status(500).json({ result: 'error', message: err })
+  }
 }
 
 module.exports.upload = async function(req, res) {
@@ -36,10 +52,10 @@ module.exports.upload = async function(req, res) {
   await uploadFile.mv(`${mediaFolder}/${uploadFile.name}`,
   function (err) {
     if (err) {
-      return res.status(500).json({ message: 'upload err' })
+      return res.status(500).json({ result: 'error', message: err })
     }
   })
-  return res.status(200).json({ success: true })
+  return res.status(200).json({ result: 'success' })
 }
 
 module.exports.del = function(req, res) {

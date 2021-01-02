@@ -1,8 +1,16 @@
 <template>
   <v-container>
     <div class="px-6 text-left">
-      <span v-for="(folderLink, i) in currentFolder" :key="i">
-        <a class="pa-1 underline" @click="changeFolderLink(i)">{{ folderLink }}</a>
+      <span>
+        Current Folder :
+      </span>
+      <span>
+        <a class="underline" @click="folderHome">Home</a>
+      </span>
+      <span>
+        <span v-for="(folderLink, i) in currentFolder" :key="i">
+          <a @click="changeFolderLink(i)">/<span class="underline">{{ folderLink }}</span></a>
+        </span>
       </span>
     </div>
     <v-data-table
@@ -23,7 +31,7 @@
         <div v-else>
           <v-btn class="pl-0" text  @click="changeFolder(item)">
             <v-icon class="pr-1" color="primary">mdi-folder</v-icon>
-            {{ item.name }}
+            <span class="underline">{{ item.name }}</span>
           </v-btn>
         </div>
       </template>
@@ -87,15 +95,17 @@ export default {
       }
     },
     getList () {
-      this.$axios.get('/api/audiofiles').then((res) => {
+      const getFolder = this.currentFolder.join('/')
+      this.$axios.post('/api/audiofiles', { folder: getFolder }).then((res) => {
         this.items = [
           ...res.data.folders,
           ...res.data.files
         ]
+        console.log(this.items)
       })
     },
     delete () {
-      this.$axios.post('/api/delfiles/', this.selected).then((res) => {
+      this.$axios.post('/api/delfiles', this.selected).then((res) => {
         this.$axios.get('/api/audiofiles').then((res) => {
           this.items = res.data
         })
@@ -112,13 +122,17 @@ export default {
       const current = this.currentFolder
       current.push(folder.name)
       this.$store.dispatch('files/changeFolder', current)
-      console.log(this.currentFolder)
+      this.getList()
     },
     changeFolderLink (idx) {
       let current = this.currentFolder
       current = current.slice(0, idx + 1)
       this.$store.dispatch('files/changeFolder', current)
-      console.log(this.currentFolder)
+      this.getList()
+    },
+    folderHome () {
+      this.$store.dispatch('files/changeFolder', [])
+      this.getList()
     }
   }
 }

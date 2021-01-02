@@ -1,5 +1,5 @@
 const state = () => ({
-  currentFolder: ['/']
+  currentFolder: []
 })
 
 const mutations = {
