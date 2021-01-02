@@ -1,5 +1,10 @@
 <template>
   <v-container>
+    <div class="px-6 text-left">
+      <span v-for="(folderLink, i) in currentFolder" :key="i">
+        <a class="pa-1 underline" @click="changeFolderLink(i)">{{ folderLink }}</a>
+      </span>
+    </div>
     <v-data-table
       class="pa-0"
       v-model="selected"
@@ -9,14 +14,22 @@
       item-key="name"
       show-select
     >
-     <template v-slot:item.name="{ item }" scops="props">
-       <v-icon v-if="item.isplay" color="red darken-4" @click="preview(item)">mdi-pause</v-icon>
-       <v-icon v-else color="green darken-4" @click="preview(item)">mdi-play</v-icon>
-       {{ item.name }}
-     </template>
-     <template v-slot:item.size="{ item }">
-       {{ bytes(item.size) }}
-     </template>
+      <template v-slot:item.name="{ item }" scops="props">
+        <div v-if="!item.isdir">
+          <v-icon v-if="item.isplay" color="red darken-4" @click="preview(item)">mdi-pause</v-icon>
+          <v-icon v-else color="green darken-4" @click="preview(item)">mdi-play</v-icon>
+          {{ item.name }}
+        </div>
+        <div v-else>
+          <v-btn class="pl-0" text  @click="changeFolder(item)">
+            <v-icon class="pr-1" color="primary">mdi-folder</v-icon>
+            {{ item.name }}
+          </v-btn>
+        </div>
+      </template>
+      <template v-slot:item.size="{ item }">
+        {{ bytes(item.size) }}
+      </template>
     </v-data-table>
     <audio ref="audio" v-on:ended="audioend">
       <source v-bind:src="source">
@@ -27,9 +40,10 @@
 <script>
 import { dataFormat } from '../mixins/format'
 import { playlist } from '../mixins/playlist'
+import { files } from '../mixins/files'
 
 export default {
-  mixins: [dataFormat, playlist],
+  mixins: [dataFormat, playlist, files],
   props: ['search'],
   data () {
     return {
@@ -41,8 +55,7 @@ export default {
       ],
       items: [],
       source: '',
-      type: '',
-      audioDuration: 100
+      type: ''
     }
   },
   created () {
@@ -75,7 +88,10 @@ export default {
     },
     getList () {
       this.$axios.get('/api/audiofiles').then((res) => {
-        this.items = res.data
+        this.items = [
+          ...res.data.folders,
+          ...res.data.files
+        ]
       })
     },
     delete () {
@@ -91,7 +107,25 @@ export default {
     },
     addPlaylist () {
       this.addPlaylistItems(this.selected)
+    },
+    changeFolder (folder) {
+      const current = this.currentFolder
+      current.push(folder.name)
+      this.$store.dispatch('files/changeFolder', current)
+      console.log(this.currentFolder)
+    },
+    changeFolderLink (idx) {
+      let current = this.currentFolder
+      current = current.slice(0, idx + 1)
+      this.$store.dispatch('files/changeFolder', current)
+      console.log(this.currentFolder)
     }
   }
 }
 </script>
+
+<style scoped>
+.underline {
+  text-decoration: underline;
+}
+</style>
