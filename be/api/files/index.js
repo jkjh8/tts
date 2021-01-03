@@ -49,7 +49,8 @@ module.exports.files = async function(req, res) {
 
 module.exports.upload = async function(req, res) {
   let uploadFile = Object.values(req.files)[0]
-  await uploadFile.mv(`${mediaFolder}/${uploadFile.name}`,
+  const uploadPath = path.join(mediaFolder, req.body.folder)
+  await uploadFile.mv(`${uploadPath}/${uploadFile.name}`,
   function (err) {
     if (err) {
       return res.status(500).json({ result: 'error', message: err })

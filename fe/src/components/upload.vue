@@ -112,7 +112,8 @@
           extensions="gif,jpg,jpeg,png,webp,wav,mp3,flac,mp4"
           accept="image/png,image/gif,image/jpeg,image/webp,audio/wav,audio/mp3,audio/flac,video/mp4"
           :multiple="true"
-          :size="1024 * 1024 * 10"
+          :data="fileCustomData"
+          :size="1024 * 1024 * 1024"
           :drop="true"
           :drop-directory="true"
           @input-filter="inputFilter"
@@ -137,10 +138,17 @@
 <script>
 import FileUpload from 'vue-upload-component'
 import { dataFormat } from '../mixins/format'
+import { files } from '../mixins/files'
 
 export default {
-  mixins: [dataFormat],
+  mixins: [dataFormat, files],
   components: { FileUpload },
+  computed: {
+    fileCustomData: function () {
+      const curDir = this.currentFolder.join('/')
+      return { folder: curDir }
+    }
+  },
   data () {
     return {
       postAction: `http://${window.location.hostname}:3000/api/uploadfiles`,
