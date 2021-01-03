@@ -1,10 +1,24 @@
 <template>
   <v-container>
     <v-row rows="2" class="mx-2">
-      <div class="pt-2">
+      <div class="px-2">
         <h3>Audio Files</h3>
       </div>
+      <v-spacer />
       <div color="gray" class="ml-3">
+        <v-tooltip top>
+          <template v-slot:activator="{ on, attrs }">
+            <v-icon
+              class="icon"
+              color="gray"
+              v-bind="attrs"
+              v-on="on"
+              @click="createFolder"            >
+              mdi-folder-plus
+            </v-icon>
+          </template>
+          <span>Create Folder</span>
+        </v-tooltip>
         <v-tooltip top>
           <template v-slot:activator="{ on, attrs }">
             <v-icon
@@ -48,39 +62,28 @@
           <span>Refrash file list</span>
         </v-tooltip>
       </div>
-      <v-spacer />
-      <div>
-        <v-text-field
-          class="pb-3 pr-3"
-          v-model="search"
-          append-icon="mdi-magnify"
-          label="Search"
-          single-line
-          hide-details
-          dense
-        />
-      </div>
     </v-row>
     <v-divider />
     <v-row rows="10">
-      <Table :search="search" ref="fileList"></Table>
+      <Table ref="fileList"></Table>
     </v-row>
 
     <v-dialog v-model="dialog" max-width="600px" persistent>
-      <Upload ref="fileUpload" @close="dialog=false" />
+      <Upload ref="fileUpload" @close="closeUploadDialog" />
     </v-dialog>
   </v-container>
 </template>
 
 <script>
+import { files } from '../mixins/files'
 import Table from '../components/AudioFilesTable'
 import Upload from '../components/upload.vue'
 
 export default {
+  mixins: [files],
   components: { Table, Upload },
   data () {
     return {
-      search: '',
       dialog: false
     }
   },
@@ -106,6 +109,30 @@ export default {
       if (result) {
         this.$refs.fileList.delete()
       }
+    },
+    closeUploadDialog () {
+      this.dialog = false
+      this.$refs.fileList.getList()
+    },
+    async createFolder () {
+      const res = await this.$dialog.prompt({
+        title: 'Add Folder',
+        text: 'new folder name',
+        textField: {
+          type: 'input'
+        }
+      })
+      if (res) {
+        const dir = `${this.getDir}/${res}`
+        this.$axios.post('/api/createdir', { dir: dir }).then((res) => {
+          console.log(res)
+          this.getFilelist()
+        }).catch((err) => {
+          this.$dialog.message.error('Do not add folder! ' + err, {
+            position: 'top'
+          })
+        })
+      }
     }
   }
 }
@@ -113,7 +140,8 @@ export default {
 
 <style>
 .icon {
-  padding-top: 8px;
+  /* padding-top: 2px; */
+  padding-bottom: 6px;
   padding-left: 5px;
   padding-right: 5px;
 }

@@ -17,7 +17,7 @@
                 icon
                 v-bind="attrs"
                 v-on="on"
-                @click="dialog=!dialog"
+                @click="addList"
               >
                 <v-icon>mdi-plus</v-icon>
               </v-btn>
@@ -54,44 +54,39 @@
                   </v-icon>
                 </v-list-item-action>
             </v-list-item>
-
           </v-list-item-group>
         </v-list>
       </v-card-text>
     </v-card>
-    <v-dialog v-model="dialog" max-width="400px">
-      <AddPlaylistName
-        @addList="addList"
-        @close="close"
-      ></AddPlaylistName>
-    </v-dialog>
   </v-container>
 </template>
 
 <script>
 import { playlist } from '../../mixins/playlist'
-import AddPlaylistName from './AddPlaylistName'
 
 export default {
   mixins: [playlist],
-  components: { AddPlaylistName },
   data () {
     return {
       model: 0,
-      search: '',
-      dialog: false
+      search: ''
     }
   },
   methods: {
     getList () {
       this.getPlaylistNames()
     },
-    addList (item) {
-      this.addPlaylistNames(item)
-      this.close()
-    },
-    close () {
-      this.dialog = false
+    async addList () {
+      const res = await this.$dialog.prompt({
+        title: 'Add Play List',
+        text: 'New playlist name',
+        textField: {
+          type: 'input'
+        }
+      })
+      if (res) {
+        this.addPlaylistNames(res)
+      }
     },
     deleteList (item) {
       this.delPlaylistNames(item)

@@ -116,6 +116,7 @@
           :size="1024 * 1024 * 1024"
           :drop="true"
           :drop-directory="true"
+          @input="updateValue"
           @input-filter="inputFilter"
           @input-file="inputFile"
           ref="upload"
@@ -156,6 +157,9 @@ export default {
     }
   },
   methods: {
+    updateValue (value) {
+      console.log(value)
+    },
     inputFilter (newFile, oldFile, prevent) {
       if (newFile && !oldFile) {
         if (/(\/|^)(Thumbs\.db|desktop\.ini|\..+)$/.test(newFile.name)) {
@@ -174,6 +178,9 @@ export default {
       if (newFile && oldFile) {
         // update
         console.log('update', newFile)
+        if (newFile.success !== oldFile.success) {
+          console.log('success', newFile.success, newFile)
+        }
       }
       if (!newFile && oldFile) {
         // remove

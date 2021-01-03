@@ -1,23 +1,37 @@
 <template>
   <v-container>
-    <div class="px-6 text-left">
-      <span>
-        Current Folder :
-      </span>
-      <span>
-        <a class="underline" @click="folderHome">Home</a>
-      </span>
-      <span>
-        <span v-for="(folderLink, i) in currentFolder" :key="i">
-          <a @click="changeFolderLink(i)">/<span class="underline">{{ folderLink }}</span></a>
+    <div class="d-flex flex-colume">
+      <div class="px-6 pt-2 text-left">
+        <span class="textsmall">
+          Current Folder :
         </span>
-      </span>
+        <span>
+          <a class="underline" @click="folderHome">Home</a>
+        </span>
+        <span>
+          <span v-for="(folderLink, i) in currentFolder" :key="i">
+            <a @click="changeFolderLink(i)">/<span class="underline">{{ folderLink }}</span></a>
+          </span>
+        </span>
+      </div>
+      <v-spacer />
+      <div>
+        <v-text-field
+          class="pt-0 pb-3 pr-3 mt-0"
+          v-model="search"
+          append-icon="mdi-magnify"
+          label="Search"
+          single-line
+          hide-details
+          dense
+        />
+      </div>
     </div>
-    <v-data-table
-      class="pa-0"
+    <div>
+      <v-data-table
       v-model="selected"
       :headers="headers"
-      :items="items"
+      :items="filelist"
       :search="search"
       item-key="name"
       show-select
@@ -39,6 +53,7 @@
         {{ bytes(item.size) }}
       </template>
     </v-data-table>
+    </div>
     <audio ref="audio" v-on:ended="audioend">
       <source v-bind:src="source">
     </audio>
@@ -52,9 +67,9 @@ import { files } from '../mixins/files'
 
 export default {
   mixins: [dataFormat, playlist, files],
-  props: ['search'],
   data () {
     return {
+      search: '',
       selected: [],
       headers: [
         { text: 'Name', value: 'name' },
@@ -67,7 +82,7 @@ export default {
     }
   },
   created () {
-    this.getList()
+    this.getFilelist()
   },
   methods: {
     preview (item) {
@@ -95,21 +110,18 @@ export default {
       }
     },
     getList () {
-      const getFolder = this.currentFolder.join('/')
-      this.$axios.post('/api/audiofiles', { folder: getFolder }).then((res) => {
-        this.items = [
-          ...res.data.folders,
-          ...res.data.files
-        ]
-        console.log(this.items)
-      })
+      // const getFolder = this.currentFolder.join('/')
+      // this.$axios.post('/api/audiofiles', { folder: getFolder }).then((res) => {
+      //   this.items = [
+      //     ...res.data.folders,
+      //     ...res.data.files
+      //   ]
+      //   console.log(this.items)
+      // })
+      this.getFilelist()
     },
-    delete () {
-      this.$axios.post('/api/delfiles', this.selected).then((res) => {
-        this.$axios.get('/api/audiofiles').then((res) => {
-          this.items = res.data
-        })
-      })
+    async delete () {
+      await this.deleteFiles(this.selected)
       this.resetSel()
     },
     resetSel () {
@@ -141,5 +153,8 @@ export default {
 <style scoped>
 .underline {
   text-decoration: underline;
+}
+.textsmall {
+  font-size: 0.8rem;
 }
 </style>

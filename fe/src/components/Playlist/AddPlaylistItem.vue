@@ -2,18 +2,6 @@
   <v-card>
     <v-card-title>
       <h3>Audio File List</h3>
-      <v-spacer />
-      <div>
-        <v-text-field
-          class="pb-3 pr-3"
-          v-model="search"
-          append-icon="mdi-magnify"
-          label="Search"
-          single-line
-          hide-details
-          dense
-        />
-      </div>
     </v-card-title>
     <v-card-text>
       <FileList class="pa-0" :search="search" ref="filelist"></FileList>

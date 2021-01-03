@@ -8,5 +8,6 @@ router.get('/api/audiofiles', files.files)
 router.post('/api/audiofiles', files.files)
 router.post('/api/uploadfiles', files.upload)
 router.post('/api/delfiles', files.del)
+router.post('/api/createdir', files.createdir)
 
 module.exports = router;

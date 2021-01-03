@@ -34,9 +34,13 @@ export const playlist = {
       }
     },
     getPlaylistItems (current) {
-      this.$axios.get(`/api/playlist/getplaylistitems/${this.playlistnames[current].name}`).then((res) => {
-        this.$store.dispatch('playlist/updatePlaylistItems', res.data)
-      })
+      if (current) {
+        this.$axios.get(`/api/playlist/getplaylistitems/${this.playlistnames[current].name}`).then((res) => {
+          this.$store.dispatch('playlist/updatePlaylistItems', res.data)
+        })
+      } else {
+        this.$store.dispatch('playlist/updatePlaylistItems', [])
+      }
     },
     addPlaylistItems (list) {
       for (let i = 0; i < list.length; i++) {

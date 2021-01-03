@@ -60,10 +60,30 @@ module.exports.upload = async function(req, res) {
 }
 
 module.exports.del = function(req, res) {
-  const files = req.body
-  files.forEach(async (file) => {
-    fs.unlinkSync(path.join(mediaFolder, file.name))
-  })
-  res.status(200).json({ result: 'success' })
+  try {
+    const getDir = path.join(mediaFolder, req.body.folder)
+    const files = req.body.files
+    files.forEach(async (file) => {
+      if (file.isdir) {
+        const dir = path.join(getDir, file.name)
+        fs.rmdirSync(dir, { recursive: true })
+      } else {
+        fs.unlinkSync(path.join(getDir, file.name))
+      }
+    })
+    res.status(200).json({ result: 'success' })
+  } catch (err) {
+    res.status(500).json({ result: 'failed', message: err })
+  }
   // return res.status(500).json({ result: 'failed' })
+}
+
+module.exports.createdir = function(req, res) {
+  try {
+    const getdir = path.join(mediaFolder, req.body.dir)
+    fs.mkdirSync(getdir)
+    res.status(200).json({ result: 'success' })
+  } catch (err) {
+    res.status(500).json({ result: 'failed', message: err })
+  }
 }
