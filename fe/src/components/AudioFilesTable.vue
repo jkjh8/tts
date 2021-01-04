@@ -6,11 +6,11 @@
           Current Folder :
         </span>
         <span>
-          <a class="underline" @click="folderHome">Home</a>
+          <a class="underline pr-1" @click="folderHome">Home</a>
         </span>
         <span>
           <span v-for="(folderLink, i) in currentFolder" :key="i">
-            <a @click="changeFolderLink(i)">/<span class="underline">{{ folderLink }}</span></a>
+            <a @click="changeFolderLink(i)"> / <span class="underline">{{ folderLink }}</span></a>
           </span>
         </span>
       </div>
@@ -33,13 +33,15 @@
       :headers="headers"
       :items="filelist"
       :search="search"
+      :loading="loading"
+      loading-text="Loading... Please wait"
       item-key="name"
       show-select
     >
-      <template v-slot:item.name="{ item }" scops="props">
+      <template v-slot:item.name="{ item }">
         <div v-if="!item.isdir">
-          <v-icon v-if="item.isplay" color="red darken-4" @click="preview(item)">mdi-pause</v-icon>
-          <v-icon v-else color="green darken-4" @click="preview(item)">mdi-play</v-icon>
+          <v-icon v-if="item.isplay" color="red darken-4" @click="preview(item.name, filelist)">mdi-pause</v-icon>
+          <v-icon v-else color="green darken-4" @click="preview(item.name, filelist)">mdi-play</v-icon>
           {{ item.name }}
         </div>
         <div v-else>
@@ -54,9 +56,10 @@
       </template>
     </v-data-table>
     </div>
-    <audio ref="audio" v-on:ended="audioend">
+    <audio ref="audio" v-on:ended="audioend(filelist)">
       <source v-bind:src="source">
     </audio>
+    <video-preview ref="video"></video-preview>
   </v-container>
 </template>
 
@@ -64,9 +67,13 @@
 import { dataFormat } from '../mixins/format'
 import { playlist } from '../mixins/playlist'
 import { files } from '../mixins/files'
+import { audioMonitor } from '../mixins/audioMonitor'
+import VideoPreview from '../components/VideoPreview'
+import path from 'path'
 
 export default {
-  mixins: [dataFormat, playlist, files],
+  components: { VideoPreview },
+  mixins: [dataFormat, playlist, files, audioMonitor],
   data () {
     return {
       search: '',
@@ -77,39 +84,24 @@ export default {
         { text: 'Size', value: 'size' }
       ],
       items: [],
-      source: '',
-      type: ''
+      source: ''
     }
   },
   created () {
     this.getFilelist()
   },
   methods: {
-    preview (item) {
-      const index = this.items.indexOf(item)
-      if (this.items[index].isplay === false) {
-        for (let i = 0; i < this.items.length; i++) {
-          if (this.items[i].isplay) {
-            this.items[i].isplay = false
-          }
-        }
-        this.source = `http://${window.location.hostname}:3000/static/${item.name}`
-        this.$refs.audio.load()
-        this.$refs.audio.play()
-        this.items[index].isplay = true
+    preview (idx, list) {
+      if (typeof idx !== 'number') {
+        idx = list.findIndex(i => i.name === idx)
+      }
+      if (list[idx].type === 'mp3' || list[idx].type === 'wav') {
+        this.audioMon(idx, list)
       } else {
-        this.$refs.audio.pause()
-        this.items[index].isplay = false
+        this.$refs.video.play(path.join(this.dir, list[idx].name))
       }
     },
-    audioend () {
-      for (let i = 0; i < this.items.length; i++) {
-        if (this.items[i].isplay) {
-          this.items[i].isplay = false
-        }
-      }
-    },
-    getList () {
+    async getList () {
       // const getFolder = this.currentFolder.join('/')
       // this.$axios.post('/api/audiofiles', { folder: getFolder }).then((res) => {
       //   this.items = [
@@ -118,7 +110,7 @@ export default {
       //   ]
       //   console.log(this.items)
       // })
-      this.getFilelist()
+      await this.getFilelist()
     },
     async delete () {
       await this.deleteFiles(this.selected)

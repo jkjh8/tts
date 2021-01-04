@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 
 const playlistName = new mongoose.Schema({
-  name: { type: String, requird: true }
+  name: { type: String, requird: true, unique: true }
 })
 
 

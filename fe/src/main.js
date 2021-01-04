@@ -5,6 +5,7 @@ import store from './store'
 import vuetify from './plugins/vuetify'
 import axios from 'axios'
 import VuetifyDialog from 'vuetify-dialog'
+import vClickOutside from 'v-click-outside'
 import 'material-design-icons-iconfont/dist/material-design-icons.css'
 import 'vuetify-dialog/dist/vuetify-dialog.css'
 import 'roboto-fontface/css/roboto/roboto-fontface.css'
@@ -26,3 +27,5 @@ Vue.use(VuetifyDialog, {
     vuetify
   }
 })
+
+Vue.use(vClickOutside)

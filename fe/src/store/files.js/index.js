@@ -1,6 +1,7 @@
 const state = () => ({
   currentFolder: [],
-  filelist: []
+  filelist: [],
+  loading: true
 })
 
 const mutations = {
@@ -9,6 +10,9 @@ const mutations = {
   },
   updateFiles (state, payload) {
     state.filelist = payload
+  },
+  changeLoadState (state, payload) {
+    state.loading = payload
   }
 }
 
@@ -18,6 +22,9 @@ const actions = {
   },
   updateFiles ({ commit }, payload) {
     commit('updateFiles', payload)
+  },
+  changeLoadState ({ commit }, payload) {
+    commit('changeLoadState', payload)
   }
 }
 

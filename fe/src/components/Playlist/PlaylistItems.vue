@@ -47,11 +47,16 @@
             :key="i"
           >
             <v-list-item-avatar>
-              <v-icon v-if="item.isplay" color="red darken-4" @click="preview(i)">mdi-pause</v-icon>
-              <v-icon v-else color="green darken-4" @click="preview(i)">mdi-play</v-icon>
+              <v-icon v-if="item.isplay" color="red darken-4" @click="preview(i, playlistitems)">mdi-pause</v-icon>
+              <v-icon v-else color="green darken-4" @click="preview(i, playlistitems)">mdi-play</v-icon>
             </v-list-item-avatar>
             <v-list-item-content>
-              <v-list-item-title class="text-left" v-text="item.name"></v-list-item-title>
+              <v-list-item-title class="text-left">
+                <span>{{ item.name }}</span>
+                <span style="color: gray; font-size: 0.7rem; margin-left: 10px;">
+                  path/{{ item.dir }}
+                </span>
+              </v-list-item-title>
             </v-list-item-content>
             <v-list-item-action>
               <v-icon
@@ -70,7 +75,7 @@
         @closeAddItemDialog="closeAddItemDialog"
       ></AddPlaylistItem>
     </v-dialog>
-    <audio ref="audio" v-on:ended="audioend">
+    <audio ref="audio" v-on:ended="audioend(playlistitems)">
       <source v-bind:src="source">
     </audio>
   </v-container>
@@ -78,11 +83,12 @@
 
 <script>
 import { playlist } from '../../mixins/playlist'
+import { audioMonitor } from '../../mixins/audioMonitor'
 import AddPlaylistItem from './AddPlaylistItem'
 
 export default {
   components: { AddPlaylistItem },
-  mixins: [playlist],
+  mixins: [playlist, audioMonitor],
   data () {
     return {
       source: '',
@@ -93,28 +99,8 @@ export default {
     closeAddItemDialog () {
       this.dialog = false
     },
-    preview (idx) {
-      if (this.playlistitems[idx].isplay === false) {
-        for (let i = 0; i < this.playlistitems.length; i++) {
-          if (this.playlistitems[i].isplay) {
-            this.playlistitems[i].isplay = false
-          }
-        }
-        this.source = `http://${window.location.hostname}:3000/static/${this.playlistitems[idx].name}`
-        this.$refs.audio.load()
-        this.$refs.audio.play()
-        this.playlistitems[idx].isplay = true
-      } else {
-        this.$refs.audio.pause()
-        this.playlistitems[idx].isplay = false
-      }
-    },
-    audioend () {
-      for (let i = 0; i < this.playlistitems.length; i++) {
-        if (this.playlistitems[i].isplay) {
-          this.playlistitems[i].isplay = false
-        }
-      }
+    preview (idx, list) {
+      this.audioMon(idx, list)
     }
   }
 }

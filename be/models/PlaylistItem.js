@@ -6,7 +6,9 @@ const playlistitem = new mongoose.Schema({
   isplay: { type: Boolean, default: false },
   listname: { type: String, required: true },
   size: { type: Number },
-  type: { type: String }
+  type: { type: String },
+  path: { type: String },
+  dir: { type: String }
 })
 
 const PlaylistItem = mongoose.model('PlaylistItem', playlistitem)

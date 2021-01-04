@@ -97,7 +97,8 @@ export default {
   },
   methods: {
     refrashList () {
-      this.$refs.fileList.getList()
+      this.$store.dispatch('files/changeLoadState', true)
+      this.getFilelist()
       this.$dialog.message.info('Audio file list refrashed!', {
         position: 'bottom'
       })

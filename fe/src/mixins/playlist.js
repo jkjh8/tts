@@ -5,14 +5,18 @@ export const playlist = {
     ...mapState({
       playlistnames: state => state.playlist.playlistnames,
       playlistitems: state => state.playlist.playlistitems,
-      currentPlaylist: state => state.playlist.currentPlaylist
-    })
+      currentPlaylist: state => state.playlist.currentPlaylist,
+      currentDir: state => state.files.currentFolder
+    }),
+    dir: function () {
+      return this.currentDir.join('/')
+    }
   },
   methods: {
     getPlaylistNames () {
       this.$axios.get('/api/playlist/getplaylistname').then((res) => {
         return this.$store.dispatch('playlist/updatePlaylistNames', res.data)
-      })
+      }).catch(err => { this.$dialog.message.error(`${err}`, { position: 'top' }) })
     },
     addPlaylistNames (item) {
       this.$axios.post('/api/playlist/addplaylistname', { name: item }).then(() => {
@@ -34,8 +38,9 @@ export const playlist = {
       }
     },
     getPlaylistItems (current) {
-      if (current) {
-        this.$axios.get(`/api/playlist/getplaylistitems/${this.playlistnames[current].name}`).then((res) => {
+      const currentPlaylistName = this.playlistnames[current].name
+      if (currentPlaylistName) {
+        this.$axios.get(`/api/playlist/getplaylistitems/${currentPlaylistName}`).then((res) => {
           this.$store.dispatch('playlist/updatePlaylistItems', res.data)
         })
       } else {
@@ -44,6 +49,7 @@ export const playlist = {
     },
     addPlaylistItems (list) {
       for (let i = 0; i < list.length; i++) {
+        list[i].dir = this.dir
         list[i].listname = this.playlistnames[this.currentPlaylist].name
       }
       this.$axios.post('/api/playlist/addplaylistitems', list).then((res) => {
@@ -71,6 +77,7 @@ export const playlist = {
     },
     async selPlaylist (idx) {
       await this.$store.dispatch('playlist/updateCurrentPlaylist', idx)
+      console.log(idx)
       this.getPlaylistItems(idx)
     }
   }

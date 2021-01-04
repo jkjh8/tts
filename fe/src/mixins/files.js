@@ -4,7 +4,8 @@ export const files = {
   computed: {
     ...mapState({
       currentFolder: state => state.files.currentFolder,
-      filelist: state => state.files.filelist
+      filelist: state => state.files.filelist,
+      loading: state => state.files.loading
     }),
     getDir: function () {
       return this.currentFolder.join('/')
@@ -18,6 +19,8 @@ export const files = {
           ...res.data.files
         ]
         this.$store.dispatch('files/updateFiles', files)
+        this.$store.dispatch('files/changeLoadState', false)
+        console.log(files)
       }).catch((err) => {
         this.$dialog.message.error('Do not get file list! ' + err, {
           position: 'top'

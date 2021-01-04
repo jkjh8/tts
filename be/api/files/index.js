@@ -28,7 +28,8 @@ module.exports.files = async function(req, res) {
           path: filePath,
           type: "Dir",
           size: stat.size,
-          isdir: stat.isDirectory()
+          isdir: stat.isDirectory(),
+          isplay: false
         })
       } else {
         files.push({
