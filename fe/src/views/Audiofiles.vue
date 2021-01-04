@@ -19,6 +19,7 @@
           </template>
           <span>Create Folder</span>
         </v-tooltip>
+        <span>|</span>
         <v-tooltip top>
           <template v-slot:activator="{ on, attrs }">
             <v-icon
