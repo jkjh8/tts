@@ -77,7 +77,7 @@
 
 <script>
 import { files } from '../mixins/files'
-import Table from '../components/AudioFilesTable'
+import Table from '../components/Files/AudioFilesTable'
 import Upload from '../components/upload.vue'
 
 export default {

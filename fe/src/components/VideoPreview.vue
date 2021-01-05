@@ -1,6 +1,11 @@
 <template>
-  <v-dialog v-model="dialog" class="pa-0" max-width="800">
-    <div width="100%">
+  <v-dialog
+    v-model="dialog"
+    max-width="800"
+    persistent
+    transition="dialog-bottom-transition"
+  >
+    <v-card>
       <v-responsive :aspect-ratio="16/9">
         <v-btn
           color="grey darken-4"
@@ -11,21 +16,21 @@
           absolute
           top
           right
-          @click="dialog=false"
+          @click="close"
         >
           <v-icon>mdi-close</v-icon>
         </v-btn>
         <video-player
           ref="videoPlayer"
-          v-click-outside="pause"
           class="mx-auto"
           :options="source"
 
           @play="isPlaying=true"
           @pause="isPlaying=false"
-        />
+        >
+        </video-player>
       </v-responsive>
-    </div>
+    </v-card>
   </v-dialog>
 </template>
 
@@ -40,15 +45,15 @@ export default {
   data () {
     return {
       dialog: false,
+      dialogWidth: 'videoWidth',
       isPlaying: false,
       source: {
-        width: '700',
+        width: 'videoWidth',
         language: 'ko'
       }
     }
   },
   mounted () {
-    this.resize()
     window.addEventListener('resize', this.resize, { passive: true })
   },
   beforeDestroy () {
@@ -86,11 +91,17 @@ export default {
       }
     },
     resize () {
-      if (window.window.innerWidth < 900) {
+      console.log(window.innerWidth)
+      if (window.innerWidth < 800) {
         this.source.width = window.innerWidth
       } else {
         this.source.width = 800
       }
+    },
+    close () {
+      console.log('close')
+      this.pause()
+      this.dialog = false
     }
   }
 }
@@ -98,6 +109,7 @@ export default {
 
 <style>
 .v-btn-floating {
+
   bottom: 0;
   margin: 36px 0 0 0;
   opacity: .7;

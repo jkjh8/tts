@@ -40,9 +40,23 @@
     >
       <template v-slot:item.name="{ item }">
         <div v-if="!item.isdir">
-          <v-icon v-if="item.isplay" color="red darken-4" @click="preview(item.name, filelist)">mdi-pause</v-icon>
-          <v-icon v-else color="green darken-4" @click="preview(item.name, filelist)">mdi-play</v-icon>
-          {{ item.name }}
+          <span v-if="item.isplay">
+            <v-progress-circular
+              :rotate="-90"
+              :size="30"
+              :width="3"
+              :value="currentTime"
+              color="blue-grey"
+            >
+              <v-icon  color="red darken-4" @click="preview(item.name, filelist)">mdi-pause</v-icon>
+            </v-progress-circular>
+          </span>
+          <span v-else>
+            <v-icon color="green darken-4" @click="preview(item.name, filelist)">mdi-play</v-icon>
+          </span>
+          <span>
+            {{ item.name }}
+          </span>
         </div>
         <div v-else>
           <v-btn class="pl-0" text  @click="changeFolder(item)">
@@ -56,7 +70,7 @@
       </template>
     </v-data-table>
     </div>
-    <audio ref="audio" v-on:ended="audioend(filelist)">
+    <audio ref="audio" v-on:ended="audioend(filelist)" @timeupdate="onTimeUpdate">
       <source v-bind:src="source">
     </audio>
     <video-preview ref="video"></video-preview>
@@ -64,16 +78,16 @@
 </template>
 
 <script>
-import { dataFormat } from '../mixins/format'
-import { playlist } from '../mixins/playlist'
-import { files } from '../mixins/files'
-import { audioMonitor } from '../mixins/audioMonitor'
-import VideoPreview from '../components/VideoPreview'
+import { audioMonitor } from '../../mixins/audioMonitor'
+import { dataFormat } from '../../mixins/format'
+import { playlist } from '../../mixins/playlist'
+import { files } from '../../mixins/files'
+import VideoPreview from '../VideoPreview'
 import path from 'path'
 
 export default {
   components: { VideoPreview },
-  mixins: [dataFormat, playlist, files, audioMonitor],
+  mixins: [audioMonitor, dataFormat, playlist, files, audioMonitor],
   data () {
     return {
       search: '',
@@ -101,17 +115,6 @@ export default {
         this.$refs.video.play(path.join(this.dir, list[idx].name))
       }
     },
-    async getList () {
-      // const getFolder = this.currentFolder.join('/')
-      // this.$axios.post('/api/audiofiles', { folder: getFolder }).then((res) => {
-      //   this.items = [
-      //     ...res.data.folders,
-      //     ...res.data.files
-      //   ]
-      //   console.log(this.items)
-      // })
-      await this.getFilelist()
-    },
     async delete () {
       await this.deleteFiles(this.selected)
       this.resetSel()
@@ -126,17 +129,17 @@ export default {
       const current = this.currentFolder
       current.push(folder.name)
       this.$store.dispatch('files/changeFolder', current)
-      this.getList()
+      this.getFilelist()
     },
     changeFolderLink (idx) {
       let current = this.currentFolder
       current = current.slice(0, idx + 1)
       this.$store.dispatch('files/changeFolder', current)
-      this.getList()
+      this.getFilelist()
     },
     folderHome () {
       this.$store.dispatch('files/changeFolder', [])
-      this.getList()
+      this.getFilelist()
     }
   }
 }

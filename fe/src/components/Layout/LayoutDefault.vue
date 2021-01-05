@@ -54,13 +54,13 @@
               <v-list-item-subtitle>playlist for player</v-list-item-subtitle>
             </v-list-item-content>
           </v-list-item>
-          <v-list-item to="/tts">
+          <v-list-item to="/player">
             <v-list-item-avatar>
               <v-icon>mdi-play</v-icon>
             </v-list-item-avatar>
             <v-list-item-content>
-              <v-list-item-title>Text To Speech</v-list-item-title>
-              <v-list-item-subtitle>text to speech player</v-list-item-subtitle>
+              <v-list-item-title>Play</v-list-item-title>
+              <v-list-item-subtitle>Media & TTS Play</v-list-item-subtitle>
             </v-list-item-content>
           </v-list-item>
           <v-list-item to="/scheduler">

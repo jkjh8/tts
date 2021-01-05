@@ -1,6 +1,11 @@
 import path from 'path'
 
 export const audioMonitor = {
+  data () {
+    return {
+      currentTime: 0
+    }
+  },
   methods: {
     audioMon (idx, list) {
       let file
@@ -30,6 +35,9 @@ export const audioMonitor = {
           list[i].isplay = false
         }
       }
+    },
+    onTimeUpdate () {
+      this.currentTime = Math.round(this.$refs.audio.currentTime / this.$refs.audio.duration * 100)
     }
   }
 }

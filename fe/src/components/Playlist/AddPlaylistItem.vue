@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import FileList from '../AudioFilesTable'
+import FileList from '../Files/AudioFilesTable'
 
 export default {
   components: { FileList },

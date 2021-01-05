@@ -17,7 +17,7 @@
                 icon
                 v-bind="attrs"
                 v-on="on"
-                @click="dialog=!dialog"
+                @click="openDialog"
               >
                 <v-icon>mdi-plus</v-icon>
               </v-btn>
@@ -47,8 +47,20 @@
             :key="i"
           >
             <v-list-item-avatar>
-              <v-icon v-if="item.isplay" color="red darken-4" @click="preview(i, playlistitems)">mdi-pause</v-icon>
-              <v-icon v-else color="green darken-4" @click="preview(i, playlistitems)">mdi-play</v-icon>
+              <span v-if="item.isplay">
+                <v-progress-circular
+                  :rotate="-90"
+                  :size="30"
+                  :width="3"
+                  :value="currentTime"
+                  color="blue-grey"
+                >
+                  <v-icon  color="red darken-4" @click="preview(i, playlistitems)">mdi-pause</v-icon>
+                </v-progress-circular>
+              </span>
+              <span v-else>
+                <v-icon color="green darken-4" @click="preview(i, playlistitems)">mdi-play</v-icon>
+              </span>
             </v-list-item-avatar>
             <v-list-item-content>
               <v-list-item-title class="text-left">
@@ -75,9 +87,10 @@
         @closeAddItemDialog="closeAddItemDialog"
       ></AddPlaylistItem>
     </v-dialog>
-    <audio ref="audio" v-on:ended="audioend(playlistitems)">
+    <audio ref="audio" v-on:ended="audioend(playlistitems)" @timeupdate="onTimeUpdate">
       <source v-bind:src="source">
     </audio>
+    <video-preview ref="video"></video-preview>
   </v-container>
 </template>
 
@@ -85,9 +98,11 @@
 import { playlist } from '../../mixins/playlist'
 import { audioMonitor } from '../../mixins/audioMonitor'
 import AddPlaylistItem from './AddPlaylistItem'
+import VideoPreview from '../VideoPreview'
+import path from 'path'
 
 export default {
-  components: { AddPlaylistItem },
+  components: { AddPlaylistItem, VideoPreview },
   mixins: [playlist, audioMonitor],
   data () {
     return {
@@ -96,11 +111,22 @@ export default {
     }
   },
   methods: {
+    preview (idx, list) {
+      if (typeof idx !== 'number') {
+        idx = list.findIndex(i => i.name === idx)
+      }
+      if (list[idx].type === 'mp3' || list[idx].type === 'wav') {
+        this.audioMon(idx, list)
+      } else {
+        this.$refs.video.play(path.join(list[idx].dir, list[idx].name))
+      }
+    },
     closeAddItemDialog () {
       this.dialog = false
     },
-    preview (idx, list) {
-      this.audioMon(idx, list)
+    openDialog () {
+      this.audioStop(this.playlistitems)
+      this.dialog = true
     }
   }
 }

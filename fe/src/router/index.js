@@ -62,11 +62,11 @@ const routes = [
     }
   },
   {
-    path: '/tts',
-    name: 'Tts',
+    path: '/player',
+    name: 'Player',
     components: {
       layout: LayoutDefault,
-      default: () => import('../views/Tts.vue')
+      default: () => import('../views/Player.vue')
     }
   },
   {

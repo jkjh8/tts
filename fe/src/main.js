@@ -5,7 +5,6 @@ import store from './store'
 import vuetify from './plugins/vuetify'
 import axios from 'axios'
 import VuetifyDialog from 'vuetify-dialog'
-import vClickOutside from 'v-click-outside'
 import 'material-design-icons-iconfont/dist/material-design-icons.css'
 import 'vuetify-dialog/dist/vuetify-dialog.css'
 import 'roboto-fontface/css/roboto/roboto-fontface.css'
@@ -14,6 +13,8 @@ import '@mdi/font/css/materialdesignicons.css'
 Vue.config.productionTip = false
 axios.defaults.baseURL = 'http://' + window.location.hostname + ':3000'
 Vue.prototype.$axios = axios
+
+export const eventBus = new Vue()
 
 new Vue({
   router,
@@ -27,5 +28,3 @@ Vue.use(VuetifyDialog, {
     vuetify
   }
 })
-
-Vue.use(vClickOutside)

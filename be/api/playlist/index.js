@@ -45,6 +45,7 @@ module.exports.getPlaylistItem = async function(req, res) {
   }
 }
 
+
 module.exports.delPlaylistItem = function(req, res) {
   dbPlaylistItem.findByIdAndRemove(req.body._id).then((result) => {
     return res.status(200).json({ message: 'success', result: result })

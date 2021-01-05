@@ -10,7 +10,6 @@
       <v-col cols="4">
         <PlaylistNames></PlaylistNames>
       </v-col>
-
       <v-col cols="8">
         <PlaylistItems></PlaylistItems>
       </v-col>
