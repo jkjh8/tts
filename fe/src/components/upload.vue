@@ -1,7 +1,7 @@
 <template>
   <v-container class="pa-0">
     <v-card>
-      <v-card-title>
+      <v-card-title v-if="simple">
         <h3>File Upload</h3>
         <v-spacer />
         <v-tooltip top>
@@ -34,7 +34,7 @@
         </v-tooltip>
       </v-card-title>
       <v-card-text>
-        <v-simple-table>
+        <v-simple-table v-if="simple">
           <template v-slot:default>
             <thead>
               <tr>
@@ -121,7 +121,7 @@
           @input-file="inputFile"
           ref="upload"
         >
-          <h1 v-if="files.length === 0" class="pa-6">Drag and drop or click</h1>
+          <h3 v-if="files.length === 0" class="pa-6">Drag and drop or click</h3>
         </file-upload>
       </v-card-text>
       <v-card-actions>
@@ -142,6 +142,12 @@ import { dataFormat } from '../mixins/format'
 import { files } from '../mixins/files'
 
 export default {
+  props: {
+    simple: {
+      type: Boolean,
+      default: true
+    }
+  },
   mixins: [dataFormat, files],
   components: { FileUpload },
   computed: {

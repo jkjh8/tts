@@ -29,46 +29,47 @@
     </div>
     <div>
       <v-data-table
-      v-model="selected"
-      :headers="headers"
-      :items="filelist"
-      :search="search"
-      :loading="loading"
-      loading-text="Loading... Please wait"
-      item-key="name"
-      show-select
-    >
-      <template v-slot:item.name="{ item }">
-        <div v-if="!item.isdir">
-          <span v-if="item.isplay">
-            <v-progress-circular
-              :rotate="-90"
-              :size="30"
-              :width="3"
-              :value="currentTime"
-              color="blue-grey"
-            >
-              <v-icon  color="red darken-4" @click="preview(item.name, filelist)">mdi-pause</v-icon>
-            </v-progress-circular>
-          </span>
-          <span v-else>
-            <v-icon color="green darken-4" @click="preview(item.name, filelist)">mdi-play</v-icon>
-          </span>
-          <span>
-            {{ item.name }}
-          </span>
-        </div>
-        <div v-else>
-          <v-btn class="pl-0" text  @click="changeFolder(item)">
-            <v-icon class="pr-1" color="primary">mdi-folder</v-icon>
-            <span class="underline">{{ item.name }}</span>
-          </v-btn>
-        </div>
-      </template>
-      <template v-slot:item.size="{ item }">
-        {{ bytes(item.size) }}
-      </template>
-    </v-data-table>
+        v-model="selected"
+        :headers="headers"
+        :items="filelist"
+        :search="search"
+        :loading="loading"
+        :single-select="singleSelect"
+        loading-text="Loading... Please wait"
+        item-key="name"
+        show-select
+      >
+        <template v-slot:item.name="{ item }">
+          <div v-if="!item.isdir">
+            <span v-if="item.isplay">
+              <v-progress-circular
+                :rotate="-90"
+                :size="30"
+                :width="3"
+                :value="currentTime"
+                color="blue-grey"
+              >
+                <v-icon  color="red darken-4" @click="preview(item.name, filelist)">mdi-pause</v-icon>
+              </v-progress-circular>
+            </span>
+            <span v-else>
+              <v-icon color="green darken-4" @click="preview(item.name, filelist)">mdi-play</v-icon>
+            </span>
+            <span>
+              {{ item.name }}
+            </span>
+          </div>
+          <div v-else>
+            <v-btn class="pl-0" text  @click="changeFolder(item)">
+              <v-icon class="pr-1" color="primary">mdi-folder</v-icon>
+              <span class="underline">{{ item.name }}</span>
+            </v-btn>
+          </div>
+        </template>
+        <template v-slot:item.size="{ item }">
+          {{ bytes(item.size) }}
+        </template>
+      </v-data-table>
     </div>
     <audio ref="audio" v-on:ended="audioend(filelist)" @timeupdate="onTimeUpdate">
       <source v-bind:src="source">
@@ -88,6 +89,12 @@ import path from 'path'
 export default {
   components: { VideoPreview },
   mixins: [audioMonitor, dataFormat, playlist, files, audioMonitor],
+  props: {
+    singleSelect: {
+      type: Boolean,
+      default: false
+    }
+  },
   data () {
     return {
       search: '',
@@ -140,6 +147,9 @@ export default {
     folderHome () {
       this.$store.dispatch('files/changeFolder', [])
       this.getFilelist()
+    },
+    getFile () {
+      this.$emit('getFile', this.selected)
     }
   }
 }

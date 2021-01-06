@@ -66,7 +66,7 @@
     </v-row>
     <v-divider />
     <v-row rows="10">
-      <Table ref="fileList"></Table>
+      <Table ref="fileList" :singleSelect="false"></Table>
     </v-row>
 
     <v-dialog v-model="dialog" max-width="600px" persistent>
