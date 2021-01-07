@@ -3,7 +3,6 @@
     <v-data-table
       :headers="headers"
       :items="items"
-      :search="search"
       hide-default-footer
     >
       <template v-slot:item.date="{ item }">
@@ -23,10 +22,7 @@
 </template>
 
 <script>
-import { logs } from '../mixins/logs'
-
 export default {
-  mixins: [logs],
   props: ['search'],
   data () {
     return {
@@ -38,6 +34,7 @@ export default {
         { text: 'E-Mail', value: 'email' },
         { text: 'Message', value: 'message' }
       ],
+      itemsPerPage: 10,
       items: [],
       length: 1,
       page: 1
@@ -47,6 +44,12 @@ export default {
     this.changePage(this.page)
   },
   methods: {
+    changePage (page) {
+      this.$axios.get(`/api/log/logs?page=${page}&limit=${this.itemsPerPage}&search=${this.search}`).then((res) => {
+        this.items = res.data.docs
+        this.length = res.data.totalPages
+      })
+    },
     async deleteLogs () {
       const res = await this.$dialog.warning({
         text: 'Do you really want to delete?',
@@ -57,6 +60,13 @@ export default {
           this.changePage(1)
         })
       }
+    },
+    searchLog () {
+      console.log(this.search)
+      this.$axios.get(`/api/log/logs?page=${this.page}&limit=${this.itemsPerPage}&search=${this.search}`).then((res) => {
+        this.items = res.data.docs
+        this.length = res.data.totalPages
+      })
     }
   }
 }

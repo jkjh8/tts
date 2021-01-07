@@ -4,7 +4,7 @@
       <h3>Audio File List</h3>
     </v-card-title>
     <v-card-text>
-      <FileList class="pa-0" :search="search" ref="filelist"></FileList>
+      <FileList class="pa-0" :search="search" :popup="false" ref="filelist"></FileList>
     </v-card-text>
     <v-card-actions>
       <v-spacer />
@@ -26,12 +26,12 @@ export default {
   },
   methods: {
     addListItem () {
-      this.$emit('closeAddItemDialog')
+      this.$emit('close')
       this.$refs.filelist.addPlaylist()
       this.$refs.filelist.resetSel()
     },
     cancelAdd () {
-      this.$emit('closeAddItemDialog')
+      this.$emit('close')
       this.$refs.filelist.resetSel()
     }
   }

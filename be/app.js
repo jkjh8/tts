@@ -17,7 +17,7 @@ require('dotenv').config()
 var indexRouter = require('./routes/index');
 
 const homedir = require('os').homedir()
-const mediaFolder = path.join(homedir, '/media')
+const mediaFolder = path.join(homedir, '/audio')
 
 var app = express();
 app.use('/static', express.static(mediaFolder))

@@ -65,7 +65,6 @@ module.exports.delAllPlaylistItems = async function(req, res) {
 
 module.exports.addPlaylistItem = async function(req, res) {
   const items = req.body
-  console.log(items)
   dbPlaylistItem.insertMany(items, (err, result) => {
     if (err) {
       res.status(500).json({ message: 'error', result: err })

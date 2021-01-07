@@ -1,46 +1,43 @@
 const fs = require('fs')
+const { parse } = require('path')
 const homedir = require('os').homedir()
 const path = require('path')
 
-const mediaFolder = path.join(homedir, '/media')
-!fs.existsSync(mediaFolder) && fs.mkdirSync(mediaFolder)
+const basePath = path.join(homedir, '/audio')
+!fs.existsSync(basePath) && fs.mkdirSync(basePath)
 
 function getDir (folder) {
   if (folder) {
-    return path.join(mediaFolder, folder)
+    return path.join(basePath, folder)
   } else {
-    return mediaFolder
+    return basePath
   }
 }
 
 module.exports.files = async function(req, res) {
   try {
-    const getFolder = await getDir(req.body.folder)
     const folders= []
     const files = []
-    const fileList = await fs.readdirSync(getFolder)
-    fileList.forEach(file => {
-      const filePath = path.join(getFolder, file)
-      const stat = fs.statSync(filePath)
-      if (stat.isDirectory()) {
-        folders.push({
-          name: file,
-          path: filePath,
-          type: "Dir",
-          size: stat.size,
-          isdir: stat.isDirectory(),
-          isplay: false
-        })
-      } else {
-        files.push({
-          name: file,
-          path: filePath,
-          type: file.split('.').pop(),
-          isdir: stat.isDirectory(),
-          size: stat.size,
-          isplay: false
-        })
+    const folder = await getDir(req.body.folder)
+    const list = await fs.readdirSync(folder)
+    list.forEach(file => {
+      const Path = path.join(folder, file)
+      const parsed = path.parse(Path)
+      const state = fs.statSync(Path)
+      const obj = {
+        name: parsed.name,
+        basename: parsed.base,
+        type: parsed.ext.replace('.', ''),
+        path: Path,
+        relativepath: Path.replace(basePath, ''),
+        isdir: state.isDirectory(),
+        size: state.size,
+        isplay: false,
+        isabsolute: true,
+        dir: req.body.folder
       }
+      if (obj.iddir) { folders.push(obj) }
+      else { files.push(obj) }
     })
     return res.status(200).json({ result: 'success', folders: folders, files: files })
   } catch (err) {
@@ -50,7 +47,7 @@ module.exports.files = async function(req, res) {
 
 module.exports.upload = async function(req, res) {
   let uploadFile = Object.values(req.files)[0]
-  const uploadPath = path.join(mediaFolder, req.body.folder)
+  const uploadPath = path.join(basePath, req.body.folder)
   await uploadFile.mv(`${uploadPath}/${uploadFile.name}`,
   function (err) {
     if (err) {
@@ -62,26 +59,23 @@ module.exports.upload = async function(req, res) {
 
 module.exports.del = function(req, res) {
   try {
-    const getDir = path.join(mediaFolder, req.body.folder)
     const files = req.body.files
     files.forEach(async (file) => {
       if (file.isdir) {
-        const dir = path.join(getDir, file.name)
-        fs.rmdirSync(dir, { recursive: true })
+        fs.rmdirSync(file.path, { recursive: true })
       } else {
-        fs.unlinkSync(path.join(getDir, file.name))
+        fs.unlinkSync(file.path)
       }
     })
     res.status(200).json({ result: 'success' })
   } catch (err) {
     res.status(500).json({ result: 'failed', message: err })
   }
-  // return res.status(500).json({ result: 'failed' })
 }
 
 module.exports.createdir = function(req, res) {
   try {
-    const getdir = path.join(mediaFolder, req.body.dir)
+    const getdir = path.join(basePath, req.body.dir)
     fs.mkdirSync(getdir)
     res.status(200).json({ result: 'success' })
   } catch (err) {

@@ -5,6 +5,7 @@ import store from './store'
 import vuetify from './plugins/vuetify'
 import axios from 'axios'
 import VuetifyDialog from 'vuetify-dialog'
+import Ripple from 'vuetify/lib/directives/ripple'
 import 'material-design-icons-iconfont/dist/material-design-icons.css'
 import 'vuetify-dialog/dist/vuetify-dialog.css'
 import 'roboto-fontface/css/roboto/roboto-fontface.css'
@@ -26,5 +27,11 @@ new Vue({
 Vue.use(VuetifyDialog, {
   context: {
     vuetify
+  }
+})
+
+Vue.use(vuetify, {
+  directives: {
+    Ripple
   }
 })

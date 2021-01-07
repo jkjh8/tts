@@ -16,9 +16,6 @@
     </v-row>
     <v-divider />
     <v-row rows="10">
-      <v-col v-show="stateWindow">
-        <Status ref="status"></Status>
-      </v-col>
       <v-col>
         <v-card class="mx-auto" min-width="200" max-width="400">
           <v-card-title class="cardtitle">
@@ -26,6 +23,7 @@
           </v-card-title>
           <v-divider />
           <v-card-text>
+            <!-- mode seletor -->
             <div class="itemWidth">
               <v-select
                 v-model="mode"
@@ -34,54 +32,54 @@
               ></v-select>
             </div>
             <div v-if="mode === 'File'">
-              <div v-if="seletedFile.length > 0">
-                {{ seletedFile[0].name }}
-              </div>
-              <v-tabs
-                v-model="tabs"
-                centered
-                icons-and-text
-              >
-                <v-tab href="#tab-1">
+              <div>
+                <v-btn
+                  @click="fileDialog=!fileDialog"
+                >
                   Select File
-                  <v-icon>mdi-file</v-icon>
-                </v-tab>
-
-                <v-tab href="#tab-2">
-                  Select List
-                  <v-icon>mdi-list-status</v-icon>
-                </v-tab>
-                <v-tabs-items v-model="tabs">
-                  <v-tab-item value="tab-1">
-                    <Upload :simple="false"></Upload>
-                  </v-tab-item>
-                  <v-tab-item value="tab-2">
-                    <div>
-                      <v-btn
-                        @click="fileDialog=!fileDialog"
-                      >
-                        Select File
-                      </v-btn>
+                </v-btn>
+              </div>
+              <!-- file selet dialog -->
+              <v-dialog
+                v-model="fileDialog"
+                max-width="600px"
+              >
+                <v-card>
+                  <v-card-title>
+                    Select File
+                  </v-card-title>
+                  <v-card-text>
+                    <Files ref="files" :popup="true" :singleSelect="true" @getFile="getFile"></Files>
+                  </v-card-text>
+                  <v-card-actions>
+                    <v-spacer />
+                    <v-btn @click="ok" text>OK</v-btn>
+                    <v-btn @click="fileDialog=!fileDialog" text>Cancel</v-btn>
+                  </v-card-actions>
+                </v-card>
+              </v-dialog>
+              <!-- file selet dialog -->
+              <v-dialog
+                v-model="statusDialog"
+              >
+                <v-card>
+                  <v-card-title>
+                    Select Zones
+                  </v-card-title>
+                  <v-card-text>
+                    <Status ref="files" :singleSelect="true" @getFile="getFile"></Status>
+                  </v-card-text>
+                  <v-card-actions>
+                    <v-spacer />
+                    <div class="d-flex justify-end">
+                      <v-btn @click="ok" text>OK</v-btn>
+                      <v-btn @click="statusDialog=!statusDialog" text>Cancel</v-btn>
                     </div>
-                    <v-dialog
-                      v-model="fileDialog"
-                    >
-                      <v-card>
-                        <v-card-title>
-                          Select File
-                        </v-card-title>
-                        <v-card-text>
-                          <Files ref="files" :singleSelect="true" @getFile="getFile"></Files>
-                        </v-card-text>
-                        <v-card-actions>
-                          <v-btn @click="ok" text>OK</v-btn>
-                          <v-btn text>Cancel</v-btn>
-                        </v-card-actions>
-                      </v-card>
-                    </v-dialog>
-                  </v-tab-item>
-                </v-tabs-items>
-              </v-tabs>
+                  </v-card-actions>
+                </v-card>
+              </v-dialog>
+              <!-- file data -->
+              <FilePlay></FilePlay>
             </div>
             <div v-else-if="mode === 'Playlist'">
               Playlist
@@ -96,18 +94,23 @@
 <script>
 import Status from '../components/Zones/Status'
 import Files from '../components/Files/AudioFilesTable'
-import Upload from '../components/upload'
+import FilePlay from '../components/player/FilePlay'
+import { player, mediainfo } from '../mixins/player'
+import { dir } from '../mixins/files'
 
 export default {
-  components: { Status, Files, Upload },
+  mixins: [player, mediainfo, dir],
+  components: { Status, Files, FilePlay },
   data () {
     return {
       tabs: null,
       stateWindow: true,
       fileDialog: false,
+      statusDialog: false,
       mode: 'File',
       playMode: ['File', 'Playlist'],
-      seletedFile: ''
+      seletedFile: '',
+      duration: '0'
     }
   },
   mounted () {
@@ -118,9 +121,11 @@ export default {
       this.$refs.files.getFile()
       this.fileDialog = false
     },
-    getFile (files) {
-      console.log(files)
-      this.seletedFile = files
+    async getFile (files) {
+      await this.$store.dispatch('player/updatePlayFile', files[0])
+      const result = await this.getMediaInfo(this.curFile)
+      console.log(result)
+      this.$store.dispatch('player/updatePlayFileInfo', result)
     }
   }
 }
@@ -141,11 +146,8 @@ export default {
   text-align: center;
 }
 
-.border {
-  border: 2px dashed orange;
-}
-.itemWidth {
-  max-width: 300px;
-  margin: auto;
+.filename {
+  font-size: 1.2rem;
+  color: black;
 }
 </style>

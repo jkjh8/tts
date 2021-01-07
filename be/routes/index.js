@@ -12,6 +12,7 @@ const audiofiles = require('./audiofiles')
 const playlist = require('./playlist')
 const status = require('./status')
 const zones = require('./zones')
+const player = require('./player')
 
 router.use(user)
 router.use(log)
@@ -19,5 +20,6 @@ router.use(audiofiles)
 router.use(playlist)
 router.use(status)
 router.use(zones)
+router.use(player)
 
 module.exports = router;

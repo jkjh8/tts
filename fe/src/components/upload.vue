@@ -4,37 +4,40 @@
       <v-card-title v-if="simple">
         <h3>File Upload</h3>
         <v-spacer />
-        <v-tooltip top>
-          <template v-slot:activator="{ on, attrs }">
-            <v-icon
-              class="icon"
-              color="gray"
-              v-bind="attrs"
-              v-on="on"
-              @click="clearFile"
-            >
-              mdi-reload
-            </v-icon>
-          </template>
-          <span>clear file list</span>
-        </v-tooltip>
-        <v-tooltip top>
-          <template v-slot:activator="{ on, attrs }">
-            <v-icon
-              class="icon"
-              color="gray"
-              v-bind="attrs"
-              v-on="on"
-              @click="$emit('close')"
-            >
-              mdi-window-close
-            </v-icon>
-          </template>
-          <span>close dialog</span>
-        </v-tooltip>
+        <file-upload
+          class="icon"
+          v-model="files"
+          :post-action="postAction"
+          extensions="webp,wav,mp3,flac,mp4"
+          accept="audio/wav,audio/mp3,audio/flac"
+          :multiple="true"
+          :data="uploadDir"
+          :size="1024 * 1024 * 1024"
+          :drop="true"
+          :drop-directory="true"
+          @input-filter="inputFilter"
+          @input-file="inputFile"
+          ref="upload"
+        >
+          <v-icon>mdi-upload</v-icon>
+        </file-upload>
+        <v-icon
+          class="icon"
+          color="gray"
+          @click="clearFile"
+        >
+          mdi-reload
+        </v-icon>
+        <v-icon
+          class="icon"
+          color="gray"
+          @click="$emit('close')"
+        >
+          mdi-window-close
+        </v-icon>
       </v-card-title>
       <v-card-text>
-        <v-simple-table v-if="simple">
+        <v-simple-table v-if="simple" class="upload">
           <template v-slot:default>
             <thead>
               <tr>
@@ -44,7 +47,14 @@
                 <th class="text-center" width="50px">Delete</th>
               </tr>
             </thead>
-            <tbody v-if="files.length > 0">
+            <tbody>
+              <tr v-if="!files.length">
+                <td colspan="7">
+                  <div class="text-center p-5">
+                    <h4>Drop files anywhere to upload</h4>
+                  </div>
+                </td>
+              </tr>
               <tr v-for="file in files" :key="file.id">
                 <td class="text-left">{{ file.name }}</td>
                 <td class="text-left">{{ bytes(file.size) }}</td>
@@ -106,27 +116,13 @@
             </tbody>
           </template>
         </v-simple-table>
-        <file-upload
-          v-model="files"
-          :post-action="postAction"
-          extensions="gif,jpg,jpeg,png,webp,wav,mp3,flac,mp4"
-          accept="image/png,image/gif,image/jpeg,image/webp,audio/wav,audio/mp3,audio/flac,video/mp4"
-          :multiple="true"
-          :data="fileCustomData"
-          :size="1024 * 1024 * 1024"
-          :drop="true"
-          :drop-directory="true"
-          @input="updateValue"
-          @input-filter="inputFilter"
-          @input-file="inputFile"
-          ref="upload"
-        >
-          <h3 v-if="files.length === 0" class="pa-6">Drag and drop or click</h3>
-        </file-upload>
       </v-card-text>
       <v-card-actions>
-        <v-btn class="primary mx-auto" v-if="!$refs.upload || !$refs.upload.active" @click.prevent="$refs.upload.active = true">
+        <v-btn class="primary mx-auto" v-if="!$refs.upload || !$refs.upload.active && !$refs.upload.uploaded" @click.prevent="$refs.upload.active = true">
           Start Upload
+        </v-btn>
+        <v-btn class="secondary mx-auto" v-else-if="$refs.upload || $refs.upload.uploaded" @click="$emit('close')">
+          Close
         </v-btn>
         <v-btn class="danger mx-auto"  v-else @click.prevent="$refs.upload.active = false">
           Stop Upload
@@ -151,21 +147,23 @@ export default {
   mixins: [dataFormat, files],
   components: { FileUpload },
   computed: {
-    fileCustomData: function () {
-      const curDir = this.currentFolder.join('/')
-      return { folder: curDir }
+    uploadDir: function () {
+      return { folder: this.getDir }
+    }
+  },
+  watch: {
+    uploaded: (newVal) => {
+      console.log(newVal)
     }
   },
   data () {
     return {
       postAction: `http://${window.location.hostname}:3000/api/uploadfiles`,
-      files: []
+      files: [],
+      uploaded: false
     }
   },
   methods: {
-    updateValue (value) {
-      console.log(value)
-    },
     inputFilter (newFile, oldFile, prevent) {
       if (newFile && !oldFile) {
         if (/(\/|^)(Thumbs\.db|desktop\.ini|\..+)$/.test(newFile.name)) {
@@ -177,20 +175,13 @@ export default {
       }
     },
     inputFile (newFile, oldFile) {
-      if (newFile && !oldFile) {
-        // add
-        console.log('add', newFile)
-      }
       if (newFile && oldFile) {
         // update
         console.log('update', newFile)
         if (newFile.success !== oldFile.success) {
-          console.log('success', newFile.success, newFile)
+          this.getFilelist()
         }
-      }
-      if (!newFile && oldFile) {
-        // remove
-        console.log('remove', oldFile)
+        console.log('uploaded', this.$refs.upload.uploaded)
       }
     },
     deleteFile (file) {

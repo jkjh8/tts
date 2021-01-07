@@ -1,5 +1,19 @@
 import { mapState } from 'vuex'
 
+export const dir = {
+  computed: {
+    ...mapState({
+      currentFolder: state => state.files.currentFolder
+    }),
+    getDir: function () {
+      if (this.currentFolder.length < 1) {
+        return '/'
+      }
+      return this.currentFolder.join('/')
+    }
+  }
+}
+
 export const files = {
   computed: {
     ...mapState({
@@ -28,7 +42,7 @@ export const files = {
       })
     },
     deleteFiles (seleted) {
-      this.$axios.post('/api/delfiles', { folder: this.getDir, files: seleted }).then((res) => {
+      this.$axios.post('/api/delfiles', { files: seleted }).then((res) => {
         console.log(res)
         this.getFilelist()
       }).catch((err) => {

@@ -39,6 +39,14 @@
         item-key="name"
         show-select
       >
+      <template v-if="popup" v-slot:item.data-table-select="{ item, isSelected, select }">
+        <v-simple-checkbox
+          :value="!item.isdir && isSelected"
+          :readonly="item.isdir"
+          :disabled="item.isdir"
+          @input="select($event)"
+        ></v-simple-checkbox>
+      </template>
         <template v-slot:item.name="{ item }">
           <div v-if="!item.isdir">
             <span v-if="item.isplay">
@@ -49,11 +57,11 @@
                 :value="currentTime"
                 color="blue-grey"
               >
-                <v-icon  color="red darken-4" @click="preview(item.name, filelist)">mdi-pause</v-icon>
+                <v-icon  color="red darken-4" @click="preview(item)">mdi-pause</v-icon>
               </v-progress-circular>
             </span>
             <span v-else>
-              <v-icon color="green darken-4" @click="preview(item.name, filelist)">mdi-play</v-icon>
+              <v-icon color="green darken-4" @click="preview(item)">mdi-play</v-icon>
             </span>
             <span>
               {{ item.name }}
@@ -71,26 +79,25 @@
         </template>
       </v-data-table>
     </div>
-    <audio ref="audio" v-on:ended="audioend(filelist)" @timeupdate="onTimeUpdate">
-      <source v-bind:src="source">
-    </audio>
-    <video-preview ref="video"></video-preview>
+    <Player ref="player"></Player>
   </v-container>
 </template>
 
 <script>
-import { audioMonitor } from '../../mixins/audioMonitor'
 import { dataFormat } from '../../mixins/format'
 import { playlist } from '../../mixins/playlist'
 import { files } from '../../mixins/files'
-import VideoPreview from '../VideoPreview'
-import path from 'path'
+import Player from '../localPlayer'
 
 export default {
-  components: { VideoPreview },
-  mixins: [audioMonitor, dataFormat, playlist, files, audioMonitor],
+  components: { Player },
+  mixins: [dataFormat, playlist, files],
   props: {
     singleSelect: {
+      type: Boolean,
+      default: false
+    },
+    popup: {
       type: Boolean,
       default: false
     }
@@ -112,15 +119,8 @@ export default {
     this.getFilelist()
   },
   methods: {
-    preview (idx, list) {
-      if (typeof idx !== 'number') {
-        idx = list.findIndex(i => i.name === idx)
-      }
-      if (list[idx].type === 'mp3' || list[idx].type === 'wav') {
-        this.audioMon(idx, list)
-      } else {
-        this.$refs.video.play(path.join(this.dir, list[idx].name))
-      }
+    preview (file) {
+      this.$refs.player.onSheet(file)
     },
     async delete () {
       await this.deleteFiles(this.selected)
@@ -150,6 +150,9 @@ export default {
     },
     getFile () {
       this.$emit('getFile', this.selected)
+    },
+    selectFile (value) {
+      console.log(value)
     }
   }
 }

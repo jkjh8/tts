@@ -70,7 +70,7 @@
     </v-row>
 
     <v-dialog v-model="dialog" max-width="600px" persistent>
-      <Upload ref="fileUpload" @close="closeUploadDialog" />
+      <Upload ref="fileUpload" @close="dialog = false" />
     </v-dialog>
   </v-container>
 </template>
@@ -111,10 +111,6 @@ export default {
       if (result) {
         this.$refs.fileList.delete()
       }
-    },
-    closeUploadDialog () {
-      this.dialog = false
-      this.$refs.fileList.getList()
     },
     async createFolder () {
       const res = await this.$dialog.prompt({

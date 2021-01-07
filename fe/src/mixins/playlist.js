@@ -5,12 +5,8 @@ export const playlist = {
     ...mapState({
       playlistnames: state => state.playlist.playlistnames,
       playlistitems: state => state.playlist.playlistitems,
-      currentPlaylist: state => state.playlist.currentPlaylist,
-      currentDir: state => state.files.currentFolder
-    }),
-    dir: function () {
-      return this.currentDir.join('/')
-    }
+      currentPlaylist: state => state.playlist.currentPlaylist
+    })
   },
   methods: {
     getPlaylistNames () {
@@ -49,8 +45,11 @@ export const playlist = {
     },
     addPlaylistItems (list) {
       for (let i = 0; i < list.length; i++) {
-        list[i].dir = this.dir
         list[i].listname = this.playlistnames[this.currentPlaylist].name
+        if (list[i].isdir) {
+          list.splice(i, 1)
+          i = i - 1
+        }
       }
       this.$axios.post('/api/playlist/addplaylistitems', list).then((res) => {
         console.log(res)

@@ -14,6 +14,7 @@
           single-line
           hide-details
           dense
+          @keyup.enter="$refs.log.searchLog()"
         />
       </div>
       <div class="mx-3 mt-1" v-if="user">
@@ -36,7 +37,7 @@
     </v-row>
     <v-divider />
     <v-row rows="10">
-      <Logs :search="search" ref="logTable" />
+      <Logs :search="search" ref="log" />
     </v-row>
   </v-container>
 </template>
@@ -55,7 +56,10 @@ export default {
   },
   methods: {
     deleteLogs () {
-      this.$refs.logTable.deleteLogs()
+      this.$refs.log.deleteLogs()
+    },
+    searchLog () {
+      console.log(this.search)
     }
   }
 }
